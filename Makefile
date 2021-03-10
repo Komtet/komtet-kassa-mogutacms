@@ -4,12 +4,12 @@ DIST_MARKET_DIR="dist/$(VERSION)"
 PROJECT_DIR="komtet-kassa"
 PROJECT_ZIP="$(PROJECT_DIR).zip"
 
-
 # Colors
 COLOR_OFF=\033[0m
 RED=\033[1;31m
 YELLOW=\e[33m
 CYAN=\033[1;36m
+
 
 version:  ## Версия проекта
 	@echo -e "${RED}Version:${COLOR_OFF} $(VERSION)"
