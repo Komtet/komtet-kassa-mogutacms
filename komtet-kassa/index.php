@@ -1,15 +1,15 @@
 <?php
 /*
 	Plugin Name: Онлайн касса КОМТЕТ Касса
-	Description: Плагин для отправки электронных чеков
+	Description: Плагин для отправки электронных чеков и фискализации по 54-ФЗ
 	Author: КОМТЕТ Касса
 	Version: 1.0.0
  */
-new kkassa;
+new KomtetKassa;
 
-class kkassa{
-	private static $tokenTimer = 81000;
-	private static $options = false;
+class KomtetKassa{
+
+    private static $pluginName = 'komtet-kassa';
 
 	public function __construct() {
 		mgActivateThisPlugin(__FILE__, array(__CLASS__, 'activate')); //Активация плагина
