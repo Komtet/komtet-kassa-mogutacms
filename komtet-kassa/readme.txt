@@ -5,8 +5,8 @@
 </p>
 
 <ul>
-  <li>Зарегистрируйтесь на сервисе <a href="https://kassa.komtet.ru/" target="_blank">КОМТЕТ Касса;</a>;</li>
-  <li>Выполните настройку с выбранным <a href="https://kassa.komtet.ru/integration/software" target="_blank">решением;</a>;</li>
-  <li>Получите параметры <b>ID магазина</b>, <b>Секретный ключ магазина</b>, <b>ID очереди</b>;</a>;</li>
+  <li>Зарегистрируйтесь на сервисе <a href="https://kassa.komtet.ru/" target="_blank">КОМТЕТ Касса</a>;</li>
+  <li>Выполните настройку с выбранным <a href="https://kassa.komtet.ru/integration/software" target="_blank">решением</a>;</li>
+  <li>Получите параметры <b>ID магазина</b>, <b>Секретный ключ магазина</b>, <b>ID очереди</b></a>;</li>
   <li>Скопируйте полученные значения в форму настроек плагина.</li>
 </ul>
