@@ -1,21 +1,16 @@
-.section-atol .base-setting-open, .section-atol .pagi, .section-atol .table-pagination, .section-atol h4{
+.section-komtet-kassa .base-setting-open, .section-komtet-kassa h4{
 	margin: 10px;
-}  
-.section-atol .base-settings{
+}
+
+.section-komtet-kassa .base-settings-open{
 	padding: 15px;
 	background: #fffce5;
 }
-.section-atol .moreInfo,
-.section-atol .refund{
-	cursor: pointer;
-}
-.section-atol [colspan="6"]{
+
+.section-komtet-kassa [colspan="6"]{
 	text-align: center;
 }
-.section-atol td:last-child {
+
+.section-komtet-kassa td:last-child {
     max-width: 500px;
-}
-.section-atol #clearPayment {
-    float: right;
-    cursor: pointer;
 }
