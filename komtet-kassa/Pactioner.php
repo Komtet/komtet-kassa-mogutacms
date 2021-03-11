@@ -15,8 +15,7 @@ class Pactioner extends Actioner {
   public function saveBaseOption() {
     $this->messageSucces = 'Сохранено';
     $this->messageError = 'Ошибка сохранения';
-    var_dump($_POST['data']);
-    die();
+
     if (!empty($_POST['data'])) {
       // Устанавливаем новые опции
       MG::setOption(array('option' => 'komtet-kassa-option', 'value' => addslashes(serialize($request['data']))));
