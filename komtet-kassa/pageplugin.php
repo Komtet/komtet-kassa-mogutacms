@@ -8,7 +8,7 @@
 	    </div>
 
 	    <div class="large-6 columns">
-	      <input type="text" name="shop_ID" value="">
+	      <input type="text" name="shop_id" value="<?php echo $options['shop_id']; ?>">
 	    </div>
 	  </div>
 
@@ -18,7 +18,7 @@
 	    </div>
 
 	    <div class="large-6 columns">
-	      <input type="text" name="secret" value="">
+	      <input type="text" name="secret" value="<?php echo $options['secret']; ?>">
 	    </div>
 	  </div>
 
@@ -28,7 +28,7 @@
 	    </div>
 
 	    <div class="large-6 columns">
-	      <input type="text" name="queue_id" value="">
+	      <input type="text" name="queue_id" value="<?php echo $options['queue_id']; ?>">
 	    </div>
 	  </div>
 
@@ -55,7 +55,7 @@
 		</div>
 
 		<div class="large-6 columns checkbox margin">
-		  <input type="checkbox" name="is_print" id="isPrint">
+		  <input type="checkbox" name="is_print" id="isPrint" <?php echo ($options['is_print']=='true'?'checked':'') ?>>
 		  <label for="isPrint"></label>
 		</div>
 	  </div>

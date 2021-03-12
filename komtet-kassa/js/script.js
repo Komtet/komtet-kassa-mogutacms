@@ -23,14 +23,14 @@ var komtetKassaModule = (function() {
               secret : $(".base-settings-open input[name=secret]").val(),
               queue_id : $(".base-settings-open input[name=queue_id]").val(),
               sno : $(".base-settings-open select[name=sno]").val(),
-              is_print : $(".base-settings-open input[name=is_print]").val(),
+              is_print : $(".base-settings-open input[name=is_print]").prop('checked'),
 
               prepayment_check_status : $(".base-settings-open select[name=prepayment_check_status]").val(),
               fullpayment_check_status : $(".base-settings-open select[name=fullpayment_check_status]").val(),
             },
           },
           dataType: "json",
-          success: function(response){
+          success: function(response) {
             // Выводим нотификацию с результатом (ошибка или успех)
             admin.indication(response.status, response.msg);
             // Если успех, обновляем страницу настроек плагина
