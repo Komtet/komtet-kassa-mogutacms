@@ -16,11 +16,11 @@ class Pactioner extends Actioner {
     $this->messageSucces = 'Сохранено';
     $this->messageError = 'Ошибка сохранения';
 
-    $request = $_POST;
+    $request_params = $_POST;
 
-    if (!empty($request['data'])) {
+    if (!empty($request_params['data'])) {
       // Устанавливаем новые опции
-      MG::setOption(array('option' => 'komtet-kassa-option', 'value' => addslashes(serialize($request['data']))));
+      MG::setOption(array('option' => 'komtet-kassa-option', 'value' => addslashes(serialize($request_params['data']))));
     }
 
     return true;
