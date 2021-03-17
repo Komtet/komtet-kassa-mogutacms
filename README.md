@@ -12,13 +12,24 @@ make build
 ```shell
 sudo chmod -R 777 php
 ```
+* Добавить запись в /etc/hosts
+```sh
+127.0.0.1       moguta-kassa.komtet.ru
+```
+* Добавить nginx конфиги
+```sh
+cd /etc/nginx/sites-enabled
+sudo ln -s [путь_до_проекта]/komtet-kassa-mogutacms/nginx.cfg /etc/nginx/sites-enabled/moguta.cfg
+sudo nginx -t
+sudo nginx -s reload
+```
 ____
 ## Установка CMS
 * Запустить проект:
 ```shell
 make start
 ```
-* Проект будет доступен по адресу: `localhost:8100`
+* Проект будет доступен по адресу: `http://moguta-kassa.komtet.ru/`
 * Настройки подключения к бд MySQL:
 ```shell
 Сервер: mysql
@@ -26,7 +37,6 @@ make start
 Пароль: devpass
 БД: test_db
 ```
-* После установки магазина, в файл `/php/index.php` первой строкой добавить: `$_SERVER['SERVER_NAME'] = 'localhost:8100';`
 
 ____
 ## Доступные команды из Makefile

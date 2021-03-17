@@ -9,40 +9,73 @@ new KomtetKassa;
 
 class KomtetKassa{
 
-    private static $pluginName = 'komtet-kassa';
+    private static $pluginName = '';
+    private static $path = '';
 
+    /**
+     * В конструктор класса происходит инициализация всех необходимых данных для работы плагина, таких как:
+     * -системное имя плагина;
+     * -локали;
+     * -шорткоды;
+     * -страница настроек плагина и активация плагина;
+     * -создание страницы для публички;
+     * -подключение css и js для публички;
+     */
 	public function __construct() {
+
+        self::$pluginName = PM::getFolderPlugin(__FILE__);
+        self::$path = PLUGIN_DIR.self::$pluginName;
+
 		mgActivateThisPlugin(__FILE__, array(__CLASS__, 'activate')); //Активация плагина
 		mgAddAction(__FILE__, array(__CLASS__, 'pageSettingsPlugin')); //Настройки плагина
-		mgAddAction('Controllers_Payment_actionWhenPayment', array(__CLASS__, 'orderPayPublic'),1);//хук плагина
-		mgAddAction('mg_gethtmlcontent', array(__CLASS__, 'atolResponse'), 1, 1);//приём ответа от atol
+		//mgAddAction('Controllers_Payment_actionWhenPayment', array(__CLASS__, 'orderPayPublic'),1);//хук плагина
+		//mgAddAction('mg_gethtmlcontent', array(__CLASS__, 'atolResponse'), 1, 1);//приём ответа от atol
 	}
 
-	static function activate() {
-		if (!MG::getSetting('atolOption')) {
-			$arr= array(
-				'apiVers' => 'v4',
-				'payment_address' => $_SERVER['SERVER_NAME'],
-				'sno' => 'osn',
-				'tax' => 'vat20',
-				'prefix' => '',
-			);
-			MG::setOption(array('option' => 'atolOption', 'value' => addslashes(serialize($arr))));
-			MG::setOption(array('option' => 'countPrintRowsAtol', 'value' => 20));
-		}
+    /**
+     * Метод выполняющийся при активации палагина
+     * Создает таблицу в базе данных и опции
+     * Используемые методы:
+     *  createDateBase()
+     *  createOptions()
+     */
+    static function activate() {
+        self::createOptions();
+        self::createDateBase();
 
-		DB::query("
-		 CREATE TABLE IF NOT EXISTS `".PREFIX."atol` (
-			`id` int(11) NOT NULL COMMENT 'ID заказа',
-			`name` varchar(32) NOT NULL COMMENT 'Номер заказа',
-			`uuid` varchar(100) NOT NULL COMMENT 'Номер чека на atol.ru',
-			`status` varchar(25) NOT NULL COMMENT 'Статус',
-			`fn_number` varchar(255) COMMENT 'Фискальный признак документа на atol.ru или текст ошибки',
-			`time` TIMESTAMP COMMENT 'Дата обработки',
-			`request` LONGTEXT COMMENT 'Содержимое заказа',
-			PRIMARY KEY (`id`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-	}
+    }
+
+	static function createOptions() {
+        /**
+         * komtet-kassa-option - поле, содержащее значения настроек плагина (shop_id, queue_id ...)
+         * komtet-kassa-payment-option - поле, содержащее настройки способов оплаты
+         */
+
+	    if (MG::getSetting('komtet-kassa-option') == null) {
+	        MG::setOption(array('option' => 'komtet-kassa-option', 'value' => ''));
+	        MG::setOption(array('option' => 'komtet-kassa-payment-option', 'value' => ''));
+	    }
+    }
+
+    static function createDateBase() {
+        /**
+         * В таблице `mg_order` создаются поля `check_type` и `is_fiscalized`
+         * Создается таблица `mg_komtet_kassa_reports`, в которой будут хранится отчёты по фискализированным чекам
+         */
+        DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `check_type` VARCHAR(25) AFTER `pay_date`", $noError = true);
+        DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `is_fiscalized` TINYINT(1) NOT NULL DEFAULT 0 AFTER `check_type`", $noError = true);
+
+
+        DB::query("
+          CREATE TABLE IF NOT EXISTS `".PREFIX."komtet_kassa_reports` (
+            `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Порядковый номер записи',
+            `order_id` int(11) NOT NULL,
+            `fisc_state` varchar(255) COMMENT 'Состояние задачи',
+            `error_description` varchar(255) COMMENT 'Описание возникшей ошибки',
+
+            PRIMARY KEY (`id`)
+          ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;");
+    }
 
 	static function preparePageSettings() {//перед генерацией страницы настроек плагина
 		$path = PLUGIN_DIR.PM::getFolderPlugin(__FILE__);//папка плагина
@@ -58,7 +91,7 @@ class KomtetKassa{
 	static function pageSettingsPlugin() {//Вывод страницы плагина в админке
 		self::preparePageSettings();
 
-		$options = unserialize(stripslashes(MG::getSetting('atolOption')));
+		$options = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
 
 		$rows = DB::query("SELECT `id`, `name` FROM `".PREFIX."payment` ORDER BY `sort` asc");
 		while ($row = DB::fetchAssoc($rows)) {
