@@ -3,14 +3,16 @@
  */
 var komtetKassaModule = (function() {
 
+
   return {
     pluginName: "komtet-kassa", //название плагина
+
 
     init: function() {
       // Сохраняет базовые настроки
 
 	  $('body').on('click', '.section-komtet-kassa .base-setting-save', function() {
-
+        console.log(komtetKassaModule.listOfPayments);
         $.ajax({
           type: "POST",
           url: mgBaseDir+"/ajaxrequest",
@@ -24,6 +26,7 @@ var komtetKassaModule = (function() {
               queue_id : $(".base-settings-open input[name=queue_id]").val(),
               sno : $(".base-settings-open select[name=sno]").val(),
               is_print : $(".base-settings-open input[name=is_print]").prop('checked'),
+              payments: komtetKassaModule.listOfPayments,
 
               prepayment_check_status : $(".base-settings-open select[name=prepayment_check_status]").val(),
               fullpayment_check_status : $(".base-settings-open select[name=fullpayment_check_status]").val(),
@@ -45,5 +48,6 @@ var komtetKassaModule = (function() {
 })();
 
 $(document).ready(function() {
+    komtetKassaModule.listOfPayments = [];
 	komtetKassaModule.init();
 });

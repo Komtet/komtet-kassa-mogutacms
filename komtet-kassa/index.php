@@ -28,7 +28,8 @@ class KomtetKassa{
 
 		mgActivateThisPlugin(__FILE__, array(__CLASS__, 'activate')); //Активация плагина
 		mgAddAction(__FILE__, array(__CLASS__, 'pageSettingsPlugin')); //Настройки плагина
-		//mgAddAction('Controllers_Payment_actionWhenPayment', array(__CLASS__, 'orderPayPublic'),1);//хук плагина
+		//mgAddAction('models_order_updateorder', array(__CLASS__, 'test'),1);//хук плагина
+
 		//mgAddAction('mg_gethtmlcontent', array(__CLASS__, 'atolResponse'), 1, 1);//приём ответа от atol
 	}
 
@@ -77,39 +78,55 @@ class KomtetKassa{
           ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;");
     }
 
-	static function preparePageSettings() {//перед генерацией страницы настроек плагина
-		$path = PLUGIN_DIR.PM::getFolderPlugin(__FILE__);//папка плагина
-		echo '
-			<link rel="stylesheet" href="'.SITE.'/'.$path.'/css/style.css" type="text/css" />
+    /**
+	 * Подключение стилей и js
+	 */
+	 static function preparePageSettings() {
+	    $path = PLUGIN_DIR.PM::getFolderPlugin(__FILE__);//папка плагина
+	    echo '
+	        <link rel="stylesheet" href="'.SITE.'/'.$path.'/css/style.css" type="text/css" />
 
-			<script>
-				includeJS("'.SITE.'/'.$path.'/js/script.js");
-			</script>
-		';
-	}
+	        <script>
+	            includeJS("'.SITE.'/'.$path.'/js/script.js");
+	        </script>
+	    ';
+	 }
 
-	static function pageSettingsPlugin() {//Вывод страницы плагина в админке
+	/**
+	 * Выводит страницу настроек плагина в админке
+	 *
+	 * Используемые методы:
+	 *  preparePageSettings()
+	 *
+	 */
+	 static function pageSettingsPlugin() {
 		self::preparePageSettings();
 
 		$options = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
+		$savedPayments  = unserialize(stripslashes(MG::getSetting('komtet-kassa-payment-option')));
 
-		$rows = DB::query("SELECT `id`, `name` FROM `".PREFIX."payment` ORDER BY `sort` asc");
+		$rows = DB::query("SELECT `id`, `name` FROM `".PREFIX."payment` WHERE `activity` = TRUE ORDER BY `sort` asc");
 		while ($row = DB::fetchAssoc($rows)) {
-			if (!in_array($row['id'], array(3, 4, 7, 12, 13)) && $row['id'] < 999) {
-				$paymentVariants[$row['id']] = $row['name'];
-			}
+            $paymentVariants[$row['id']] = [
+                'id' => $row['id'],
+                'name' => $row['name'],
+                'hash' => md5($row['name'])
+            ];
 		}
 
-		if ($_POST["page"]) {//если был произведен запрос другой страницы, то присваиваем переменной новый индекс
-			$page = $_POST["page"];
-		} else {
-			$page = 1;
-		}
+		if ($savedPayments) {
+		    foreach($paymentVariants as $payment) {
+		        foreach($savedPayments as $savedPayment) {
+		            if ($savedPayment['payId'] == $payment['id']) {
+                        $paymentVariants[(int)$savedPayment['payId']] += [
+                            'active' => true, 'option' => $savedPayment['option']
+                        ];
 
-		$countPrintRowsAtol = MG::getOption('countPrintRowsAtol');
-		$navigator = new Navigator("SELECT * FROM `".PREFIX."atol` ORDER BY `id` DESC", $page, $countPrintRowsAtol); //определяем класс
-		$sales = $navigator->getRowsSql();
-		$pagination = $navigator->getPager('forAjax');
+		                break;
+		            }
+		        }
+		    }
+		}
 
 		include 'pageplugin.php';
 	}
