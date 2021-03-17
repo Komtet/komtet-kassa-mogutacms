@@ -3,16 +3,14 @@
  */
 var komtetKassaModule = (function() {
 
-
   return {
     pluginName: "komtet-kassa", //название плагина
-
 
     init: function() {
       // Сохраняет базовые настроки
 
 	  $('body').on('click', '.section-komtet-kassa .base-setting-save', function() {
-        console.log(komtetKassaModule.listOfPayments);
+
         $.ajax({
           type: "POST",
           url: mgBaseDir+"/ajaxrequest",

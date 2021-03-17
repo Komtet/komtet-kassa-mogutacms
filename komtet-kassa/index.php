@@ -79,57 +79,57 @@ class KomtetKassa{
     }
 
     /**
-	 * Подключение стилей и js
-	 */
-	 static function preparePageSettings() {
-	    $path = PLUGIN_DIR.PM::getFolderPlugin(__FILE__);//папка плагина
-	    echo '
-	        <link rel="stylesheet" href="'.SITE.'/'.$path.'/css/style.css" type="text/css" />
+     * Подключение стилей и js
+     */
+    static function preparePageSettings() {
+        $path = PLUGIN_DIR.PM::getFolderPlugin(__FILE__);//папка плагина
+        echo '
+            <link rel="stylesheet" href="'.SITE.'/'.$path.'/css/style.css" type="text/css" />
 
-	        <script>
-	            includeJS("'.SITE.'/'.$path.'/js/script.js");
-	        </script>
-	    ';
-	 }
+            <script>
+                includeJS("'.SITE.'/'.$path.'/js/script.js");
+            </script>
+        ';
+    }
 
-	/**
-	 * Выводит страницу настроек плагина в админке
-	 *
-	 * Используемые методы:
-	 *  preparePageSettings()
-	 *
-	 */
-	 static function pageSettingsPlugin() {
-		self::preparePageSettings();
+    /**
+     * Выводит страницу настроек плагина в админке
+     *
+     * Используемые методы:
+     *  preparePageSettings()
+     *
+     */
+    static function pageSettingsPlugin() {
+        self::preparePageSettings();
 
-		$options = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
-		$savedPayments  = unserialize(stripslashes(MG::getSetting('komtet-kassa-payment-option')));
+        $options = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
+        $savedPayments  = unserialize(stripslashes(MG::getSetting('komtet-kassa-payment-option')));
 
-		$rows = DB::query("SELECT `id`, `name` FROM `".PREFIX."payment` WHERE `activity` = TRUE ORDER BY `sort` asc");
-		while ($row = DB::fetchAssoc($rows)) {
+        $rows = DB::query("SELECT `id`, `name` FROM `".PREFIX."payment` WHERE `activity` = TRUE ORDER BY `sort` asc");
+        while ($row = DB::fetchAssoc($rows)) {
             $paymentVariants[$row['id']] = [
                 'id' => $row['id'],
                 'name' => $row['name'],
                 'hash' => md5($row['name'])
             ];
-		}
+        }
 
-		if ($savedPayments) {
-		    foreach($paymentVariants as $payment) {
-		        foreach($savedPayments as $savedPayment) {
-		            if ($savedPayment['payId'] == $payment['id']) {
+        if ($savedPayments) {
+            foreach($paymentVariants as $payment) {
+                foreach($savedPayments as $savedPayment) {
+                    if ($savedPayment['payId'] == $payment['id']) {
                         $paymentVariants[(int)$savedPayment['payId']] += [
                             'active' => true, 'option' => $savedPayment['option']
                         ];
 
-		                break;
-		            }
-		        }
-		    }
-		}
+                        break;
+                    }
+                }
+            }
+        }
 
-		include 'pageplugin.php';
-	}
+        include 'pageplugin.php';
+    }
 
 	static function convertToRub($rates, $price, $currency) {
 		$iso = false;
