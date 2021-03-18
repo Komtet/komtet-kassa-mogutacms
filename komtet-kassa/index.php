@@ -26,11 +26,8 @@ class KomtetKassa{
         self::$pluginName = PM::getFolderPlugin(__FILE__);
         self::$path = PLUGIN_DIR.self::$pluginName;
 
-		mgActivateThisPlugin(__FILE__, array(__CLASS__, 'activate')); //Активация плагина
-		mgAddAction(__FILE__, array(__CLASS__, 'pageSettingsPlugin')); //Настройки плагина
-		//mgAddAction('models_order_updateorder', array(__CLASS__, 'test'),1);//хук плагина
-
-		//mgAddAction('mg_gethtmlcontent', array(__CLASS__, 'atolResponse'), 1, 1);//приём ответа от atol
+		mgActivateThisPlugin(__FILE__, array(__CLASS__, 'activate'));  // Активация плагина
+		mgAddAction(__FILE__, array(__CLASS__, 'pageSettingsPlugin'));  // Настройки плагина
 	}
 
     /**
@@ -82,7 +79,7 @@ class KomtetKassa{
      * Подключение стилей и js
      */
     static function preparePageSettings() {
-        $path = PLUGIN_DIR.PM::getFolderPlugin(__FILE__);//папка плагина
+        $path = PLUGIN_DIR.PM::getFolderPlugin(__FILE__);  // папка плагина
         echo '
             <link rel="stylesheet" href="'.SITE.'/'.$path.'/css/style.css" type="text/css" />
 
