@@ -11,6 +11,9 @@ var komtetKassaModule = (function() {
 
 	  $('body').on('click', '.section-komtet-kassa .base-setting-save', function() {
 
+        let prepaymentStatus = $(".base-settings-open select[name=prepayment_check_status]").val();
+        let is_prepayment_check = prepaymentStatus != "false"
+
         $.ajax({
           type: "POST",
           url: mgBaseDir+"/ajaxrequest",
@@ -26,8 +29,9 @@ var komtetKassaModule = (function() {
               is_print : $(".base-settings-open input[name=is_print]").prop('checked'),
               payments: komtetKassaModule.listOfPayments,
 
-              prepayment_check_status : $(".base-settings-open select[name=prepayment_check_status]").val(),
+              prepayment_check_status : prepaymentStatus,
               fullpayment_check_status : $(".base-settings-open select[name=fullpayment_check_status]").val(),
+              is_prepayment_check: is_prepayment_check,
             },
           },
           dataType: "json",

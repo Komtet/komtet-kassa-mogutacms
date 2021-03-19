@@ -4,7 +4,12 @@
 	Description: Плагин для отправки электронных чеков и фискализации по 54-ФЗ
 	Author: КОМТЕТ Касса
 	Version: 1.0.0
- */
+*/
+
+require PLUGIN_DIR.'komtet-kassa/lib/komtet-kassa-php-sdk/autoload.php';
+
+use Komtet\KassaSdk\CalculationMethod;
+
 new KomtetKassa;
 
 class KomtetKassa{
@@ -28,6 +33,8 @@ class KomtetKassa{
 
 		mgActivateThisPlugin(__FILE__, array(__CLASS__, 'activate'));  // Активация плагина
 		mgAddAction(__FILE__, array(__CLASS__, 'pageSettingsPlugin'));  // Настройки плагина
+		mgAddAction('Models_Order_updateOrder', array(__CLASS__, 'updateOrder'),1);  // Подписка на хук(обновление заказа)
+		mgAddAction('Models_Order_addOrder', array(__CLASS__, 'createOrder'),1);  // Подписка на хук(созадние заказа)
 	}
 
     /**
@@ -126,6 +133,69 @@ class KomtetKassa{
         }
 
         include 'pageplugin.php';
+    }
+
+    static function createOrder($args){
+        /**
+        * Чек будет фискализирован:
+        *   - созданный заказ оплачен(установлен флаг "Оплачен");
+        *   - способ оплаты совпадает с выбранными настройками на странице плагина.
+        */
+        $orderId = $args['origResult']['id'];
+        $mogutaOrder = $args['args'][0];
+
+        if (!$mogutaOrder['paided']) {
+            return false;
+        }
+
+         $paymentOptions  = unserialize(stripslashes(MG::getSetting('komtet-kassa-payment-option')));
+         foreach($paymentOptions as $payment) {
+            if ($payment['payId'] == $mogutaOrder['payment_id']) {
+                $paymentType = $payment['option'];
+
+                break;
+            }
+         }
+
+         if ($paymentType) {
+            // брать константы из сдк
+            if (unserialize(stripslashes(MG::getSetting('komtet-kassa-option')))['is_prepayment_check'] == 'true') {
+                $checkType = CalculationMethod::PRE_PAYMENT_FULL;
+            } else {
+                $checkType = CalculationMethod::FULL_PAYMENT;
+            }
+
+            try {
+                $check = self::buildCheck($orderId, $mogutaOrder, $paymentType, $checkType);
+            } catch (Exception $e) {
+                mg::loger("Ошибка при сборке чека по заказу - ". $orderId);
+                return false;
+            }
+
+            try {
+                self::fiscalizeOrder($orderId, $mogutaOrder, $check, $checkType);
+            } catch (Exception $e) {
+                mg::loger("Ошибка при фискализации чека по заказу - ". $orderId);
+                return false;
+            }
+         }
+
+        return true;
+    }
+
+    static function updateOrder($args) {
+        var_dump($args);
+        die();
+    }
+
+    static function buildCheck($orderId, $mogutaOrder, $paymentType, $checkType) {
+
+        return true;
+    }
+
+    static function fiscalizeOrder($orderId, $mogutaOrder, $check, $checkType) {
+
+        return true;
     }
 
 	static function convertToRub($rates, $price, $currency) {
