@@ -183,8 +183,8 @@ class KomtetKassa{
     }
 
     static function updateOrder($args) {
-        var_dump($args);
-        die();
+
+        return true;
     }
 
     static function buildCheck($orderId, $mogutaOrder, $paymentType, $checkType) {
