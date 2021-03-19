@@ -158,7 +158,6 @@ class KomtetKassa{
          }
 
          if ($paymentType) {
-            // брать константы из сдк
             if (unserialize(stripslashes(MG::getSetting('komtet-kassa-option')))['is_prepayment_check'] == 'true') {
                 $checkType = CalculationMethod::PRE_PAYMENT_FULL;
             } else {
