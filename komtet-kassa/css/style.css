@@ -14,3 +14,7 @@
 .section-komtet-kassa td:last-child {
     max-width: 500px;
 }
+
+.mg-admin-html .sett-line:hover input + label:not(.input-group-label), .mg-admin-html .sett-line:hover select {
+    box-shadow: unset !important
+}

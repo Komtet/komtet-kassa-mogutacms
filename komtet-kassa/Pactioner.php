@@ -21,6 +21,7 @@ class Pactioner extends Actioner {
     if (!empty($request_params['data'])) {
       // Устанавливаем новые опции
       MG::setOption(array('option' => 'komtet-kassa-option', 'value' => addslashes(serialize($request_params['data']))));
+      MG::setOption(array('option' => 'komtet-kassa-payment-option', 'value' => addslashes(serialize($request_params['data']['payments']))));
     }
 
     return true;
