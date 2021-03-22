@@ -68,8 +68,8 @@
 
 		<div class="large-6 columns checkbox margin">
 		  <select name="prepayment_check_status" onChange="selectedPrepaymentStatus(this)" id="prepayment_check_status">
-		    <option value="false" <?php echo ($options['prepayment_check_status'] == "false" ? 'selected' : ''); ?>>Не выдавать</option>
-		    <option value=2 <?php echo ($options['prepayment_check_status'] == 2 ? 'selected' : ''); ?>>Оплачен</option>
+		    <option value='false' <?php echo ($options['prepayment_check_status'] == 'false' ? 'selected' : ''); ?>>Не выдавать</option>
+		    <option value='paid' <?php echo ($options['prepayment_check_status'] == 'paid' ? 'selected' : ''); ?>>Оплачен</option>
 		  </select>
 		</div>
 	  </div>
@@ -82,7 +82,7 @@
 
 		<div class="large-6 columns checkbox margin">
 		  <select name="fullpayment_check_status" id="fullpayment_check_status" onfocus="selectedFullpaymentStatus()">
-		    <option value=2 id='paid' <?php echo ($options['fullpayment_check_status'] == 2 ? 'selected' : ''); ?>>Оплачен</option>
+		    <option value='paid' id='paid' <?php echo ($options['fullpayment_check_status'] == 'paid' ? 'selected' : ''); ?>>Оплачен</option>
 		    <option value=3 id='shipped' <?php echo ($options['fullpayment_check_status'] == 3 ? 'selected' : ''); ?>>В доставке</option>
 		    <option value=5 id='delivered' <?php echo ($options['fullpayment_check_status'] == 5 ? 'selected' : ''); ?>>Выполнен</option>
 		  </select>
@@ -177,7 +177,7 @@
     if (selected_value == "false") {
       document.getElementById("shipped").style.display = 'none';
       document.getElementById("delivered").style.display = 'none';
-      document.getElementById("fullpayment_check_status").value = 2;
+      document.getElementById("fullpayment_check_status").value = 'paid';
     } else {
       document.getElementById("shipped").style.display = 'block';
       document.getElementById("delivered").style.display = 'block';
@@ -191,7 +191,7 @@
       document.getElementById("shipped").style.display = 'none';
       document.getElementById("delivered").style.display = 'none';
       document.getElementById("paid").style.display = 'block';
-      document.getElementById("fullpayment_check_status").value = 2;
+      document.getElementById("fullpayment_check_status").value = 'paid';
     } else {
       document.getElementById("shipped").style.display = 'block';
       document.getElementById("delivered").style.display = 'block';
