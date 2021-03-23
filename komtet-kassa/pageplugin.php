@@ -51,6 +51,40 @@
 
 	  <div class="row">
 	    <div class="large-6 columns dashed">
+	      <span>НДС, включенный в цену:</span>
+	    </div>
+
+	    <div class="large-6 columns">
+	      <select name="vat">
+            <option value="no" <?php echo ($options['vat'] == 'no' ? 'selected' : ''); ?>>Без НДС</option>
+            <option value="0" <?php echo ($options['vat'] == '0' ? 'selected' : ''); ?>>0%</option>
+            <option value="10" <?php echo ($options['vat'] == '10' ? 'selected' : ''); ?>>10%</option>
+            <option value="20" <?php echo ($options['vat'] == '20' ? 'selected' : ''); ?>>20%</option>
+            <option value="110" <?php echo ($options['vat'] == '110' ? 'selected' : ''); ?>>10/110</option>
+            <option value="120" <?php echo ($options['vat'] == '120' ? 'selected' : ''); ?>>20/120</option>
+	      </select>
+	    </div>
+	  </div>
+
+      <div class="row">
+	    <div class="large-6 columns dashed">
+	      <span>Ставка НДС для доставки:</span>
+	    </div>
+
+	    <div class="large-6 columns">
+	      <select name="vat_delivery">
+            <option value="no" <?php echo ($options['vat_delivery'] == 'no' ? 'selected' : ''); ?>>Без НДС</option>
+            <option value="0" <?php echo ($options['vat_delivery'] == '0' ? 'selected' : ''); ?>>0%</option>
+            <option value="10" <?php echo ($options['vat_delivery'] == '10' ? 'selected' : ''); ?>>10%</option>
+            <option value="20" <?php echo ($options['vat_delivery'] == '20' ? 'selected' : ''); ?>>20%</option>
+            <option value="110" <?php echo ($options['vat_delivery'] == '110' ? 'selected' : ''); ?>>10/110</option>
+            <option value="120" <?php echo ($options['vat_delivery'] == '120' ? 'selected' : ''); ?>>20/120</option>
+	      </select>
+	    </div>
+	  </div>
+
+	  <div class="row">
+	    <div class="large-6 columns dashed">
 	      <span>Печатать чек:</span>
 		</div>
 
