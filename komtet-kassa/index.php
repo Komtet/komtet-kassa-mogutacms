@@ -290,6 +290,7 @@ class KomtetKassa{
 
             } catch (Exception $e) {
                 mg::loger("Ошибка при сборке чека по заказу - ". $order['id']);
+                return false;
             }
 
             if ($check) {
@@ -297,6 +298,7 @@ class KomtetKassa{
                     self::fiscalizeOrder($pluginSettings, $check);
                 } catch (Exception $e) {
                     mg::loger("Ошибка фискализации заказа. [Ответ - ".$e."]" );
+                    return false;
                 }
 
                 DB::query(
@@ -350,9 +352,9 @@ class KomtetKassa{
         $pluginSettings = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
 
         if (!$isReturning) {
-            $check = Check::createSell($orderId."-moguta", $user, (int)$pluginSettings['sno']);
+            $check = Check::createSell($orderId, $user, (int)$pluginSettings['sno']);
         } else {
-            $check = Check::createSellReturn($orderId."-moguta", $user, (int)$pluginSettings['sno']);
+            $check = Check::createSellReturn($orderId, $user, (int)$pluginSettings['sno']);
         }
 
         $print_check = ($pluginSettings['is_print'] === 'true');
