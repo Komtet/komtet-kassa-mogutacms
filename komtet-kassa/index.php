@@ -215,10 +215,7 @@ class KomtetKassa{
                 return false;
             }
 
-            try {
-                self::fiscalizeOrder($pluginSettings, $check);
-            } catch (Exception $e) {
-                mg::loger("Ошибка при фискализации чека по заказу - ". $orderId);
+            if (self::fiscalizeOrder($pluginSettings, $check)) {
                 return false;
             }
 
@@ -287,17 +284,13 @@ class KomtetKassa{
                     $orderId, $mogutaOrder, $paymentType, $checkType,
                     $mogutaOrder['status_id'] == self::ORDER_STATUS_MAP['returned']
                 );
-
             } catch (Exception $e) {
                 mg::loger("Ошибка при сборке чека по заказу - ". $order['id']);
                 return false;
             }
 
             if ($check) {
-                try {
-                    self::fiscalizeOrder($pluginSettings, $check);
-                } catch (Exception $e) {
-                    mg::loger("Ошибка фискализации заказа. [Ответ - ".$e."]" );
+                if (!self::fiscalizeOrder($pluginSettings, $check)) {
                     return false;
                 }
 
@@ -430,9 +423,12 @@ class KomtetKassa{
         $manager = new QueueManager($client);
 
         $manager->registerQueue('ss-queue', $pluginSettings['queue_id']);
-        $result = $manager->putCheck($check, 'ss-queue');
 
-        return $result;
+        try {
+            return $manager->putCheck($check, 'ss-queue');
+        } catch (SdkException $e) {
+            mg::loger("Ошибка фискализации заказа. [Ответ - ".$e."]" );
+            return false;
+        }
     }
-
 }
