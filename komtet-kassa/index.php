@@ -108,10 +108,8 @@ class KomtetKassa{
         DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `is_fiscalized` TINYINT(1) NOT NULL DEFAULT 0 AFTER `check_type`", $noError = true);
         DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `is_paid` TINYINT(1) NOT NULL DEFAULT 0 AFTER `is_fiscalized`", $noError = true);
         DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `fulfillment_status_id` INT(11) AFTER `is_paid`", $noError = true);
-        DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `request` JSON", $noError = true);
-        DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `response` JSON AFTER `request`", $noError = true);
-
-
+        DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `request` TEXT", $noError = true);
+        DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `response` TEXT AFTER `request`", $noError = true);
 
         DB::query("
           CREATE TABLE IF NOT EXISTS `".PREFIX."komtet_kassa_reports` (
@@ -425,8 +423,24 @@ class KomtetKassa{
 
         try {
             return $manager->putCheck($check, 'ss-queue');
-        } catch (SdkException $e) {
-            mg::loger("Ошибка фискализации заказа. [Ответ - ".$e."]" );
+        } catch (Exception $e) {
+            mg::loger(
+                "Ошибка фискализации заказа.
+                 [Ответ - ".$e->getMessage().". ".$e->getDescription()."]
+                 [Код КК - ".$e->getVLDCode()."]"
+            );
+            DB::query(
+                "UPDATE `".PREFIX."order`
+                 SET `request` = " .DB::quote(serialize($check->asArray()))."
+                 WHERE `id` = " .DB::quoteInt($check->asArray()['external_id'])
+            );
+
+            DB::query(
+                "UPDATE `".PREFIX."order`
+                 SET `response` = " .DB::quote($e->getMessage().". ".$e->getDescription()) ."
+                 WHERE `id` = " .DB::quoteInt($check->asArray()['external_id'])
+            );
+
             return false;
         }
     }
