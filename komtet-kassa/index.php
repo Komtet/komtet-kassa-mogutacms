@@ -253,7 +253,6 @@ class KomtetKassa{
         $closedOrder = ($mogutaOrder['status_id'] == $pluginSettings['fullpayment_check_status'] and
                         $order['fulfillment_status_id'] == $pluginSettings['fullpayment_check_status']);
 
-
         if ($unhandledOrder or $paidOrder or $returnedOrder or $closedOrder) {
             return false;
         }
