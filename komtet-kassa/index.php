@@ -212,7 +212,7 @@ class KomtetKassa{
                 return false;
             }
 
-            if (self::fiscalizeOrder($pluginSettings, $check)) {
+            if (!self::fiscalizeOrder($pluginSettings, $check)) {
                 return false;
             }
 
@@ -253,7 +253,12 @@ class KomtetKassa{
         $closedOrder = ($mogutaOrder['status_id'] == $pluginSettings['fullpayment_check_status'] and
                         $order['fulfillment_status_id'] == $pluginSettings['fullpayment_check_status']);
 
+
         if ($unhandledOrder or $paidOrder or $returnedOrder or $closedOrder) {
+            return false;
+        }
+
+        if ($mogutaOrder['status_id'] == self::ORDER_STATUS_MAP['returned'] && !$order['check_type']) {
             return false;
         }
 
@@ -276,14 +281,22 @@ class KomtetKassa{
                 }
             }
 
-            try {
-                $check = self::buildCheck(
-                    $orderId, $mogutaOrder, $paymentType, $checkType,
-                    $mogutaOrder['status_id'] == self::ORDER_STATUS_MAP['returned']
-                );
-            } catch (Exception $e) {
-                mg::loger("Ошибка при сборке чека по заказу - ". $order['id']);
-                return false;
+            if ($mogutaOrder['status_id'] == self::ORDER_STATUS_MAP['returned']) {
+                try {
+                    $check = self::buildCheck(
+                        $orderId, $mogutaOrder, $paymentType, $order['check_type'], $isReturning=true
+                    );
+                } catch (Exception $e) {
+                    mg::loger("Ошибка при сборке чека Возврата по заказу - ". $order['id']);
+                    return false;
+                }
+            } else {
+                try {
+                    $check = self::buildCheck($orderId, $mogutaOrder, $paymentType, $checkType);
+                } catch (Exception $e) {
+                    mg::loger("Ошибка при сборке чека по заказу - ". $order['id']);
+                    return false;
+                }
             }
 
             if ($check) {
