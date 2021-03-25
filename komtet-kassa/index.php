@@ -280,22 +280,22 @@ class KomtetKassa{
                 }
             }
 
+            $isReturn = false;
             if ($mogutaOrder['status_id'] == self::ORDER_STATUS_MAP['returned']) {
-                try {
-                    $check = self::buildCheck(
-                        $orderId, $mogutaOrder, $paymentType, $order['check_type'], $isReturning=true
-                    );
-                } catch (Exception $e) {
-                    mg::loger("Ошибка при сборке чека Возврата по заказу - ". $order['id']);
-                    return false;
-                }
-            } else {
-                try {
-                    $check = self::buildCheck($orderId, $mogutaOrder, $paymentType, $checkType);
-                } catch (Exception $e) {
-                    mg::loger("Ошибка при сборке чека по заказу - ". $order['id']);
-                    return false;
-                }
+                $isReturn = true;
+            }
+
+            try {
+                $check = self::buildCheck(
+                    $orderId,
+                    $mogutaOrder,
+                    $paymentType,
+                    $isReturn ? $order['check_type'] : $checkType,
+                    $isReturn
+                );
+            } catch (Exception $e) {
+                mg::loger("Ошибка при сборке чека " . ($isReturn ? "Возврата" : "") . " по заказу - ". $order['id']);
+                return false;
             }
 
             if ($check) {
