@@ -212,7 +212,7 @@ class KomtetKassa{
                 return false;
             }
 
-            if (self::fiscalizeOrder($pluginSettings, $check)) {
+            if (!self::fiscalizeOrder($pluginSettings, $check)) {
                 return false;
             }
 
@@ -257,6 +257,10 @@ class KomtetKassa{
             return false;
         }
 
+        if ($mogutaOrder['status_id'] == self::ORDER_STATUS_MAP['returned'] && !$order['check_type']) {
+            return false;
+        }
+
         foreach($pluginSettings['payments'] as $payment) {
             if ($payment['payId'] == $mogutaOrder['payment_id']) {
                 $paymentType = $payment['option'];
@@ -276,13 +280,21 @@ class KomtetKassa{
                 }
             }
 
+            $isReturn = false;
+            if ($mogutaOrder['status_id'] == self::ORDER_STATUS_MAP['returned']) {
+                $isReturn = true;
+            }
+
             try {
                 $check = self::buildCheck(
-                    $orderId, $mogutaOrder, $paymentType, $checkType,
-                    $mogutaOrder['status_id'] == self::ORDER_STATUS_MAP['returned']
+                    $orderId,
+                    $mogutaOrder,
+                    $paymentType,
+                    $isReturn ? $order['check_type'] : $checkType,
+                    $isReturn
                 );
             } catch (Exception $e) {
-                mg::loger("Ошибка при сборке чека по заказу - ". $order['id']);
+                mg::loger("Ошибка при сборке чека " . ($isReturn ? "Возврата" : "") . " по заказу - ". $order['id']);
                 return false;
             }
 
