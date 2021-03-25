@@ -18,3 +18,11 @@
 .mg-admin-html .sett-line:hover input + label:not(.input-group-label), .mg-admin-html .sett-line:hover select {
     box-shadow: unset !important
 }
+
+.checkbox-field-margin {
+    margin: 0 -8.75px 8px;
+}
+
+.checkbox-margin {
+    margin-top: 10px !important;
+}
