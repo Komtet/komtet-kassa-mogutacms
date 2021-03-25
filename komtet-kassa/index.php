@@ -393,7 +393,7 @@ class KomtetKassa{
 
         $payment = new Payment(
             $checkType == 'closed' && !$isReturning ? self::PAYMENTS_METHODS[self::PREPAYMENT] :
-                                                       self::PAYMENTS_METHODS[$paymentType],
+                                                      self::PAYMENTS_METHODS[$paymentType],
             round((float)($mogutaOrder['delivery_cost'] + $mogutaOrder['summ']), 2));
         $check->addPayment($payment);
 
