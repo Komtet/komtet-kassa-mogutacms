@@ -99,10 +99,6 @@ class KomtetKassa{
     }
 
     static function createDateBase() {
-        /**
-         * В таблице `mg_order` создаются поля `check_type` и `is_fiscalized`
-         * Создается таблица `mg_komtet_kassa_reports`, в которой будут хранится отчёты по фискализированным чекам
-         */
 
         DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `check_type` VARCHAR(25) AFTER `pay_date`", $noError = true);
         DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `is_fiscalized` TINYINT(1) NOT NULL DEFAULT 0 AFTER `check_type`", $noError = true);
@@ -185,7 +181,7 @@ class KomtetKassa{
         $mogutaOrder = $args['args'][0];
         $pluginSettings = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
 
-        if (!$mogutaOrder['paided'] && $mogutaOrder['status_id'] != self::ORDER_STATUS_MAP['paid']) {
+        if ($mogutaOrder['status_id'] != self::ORDER_STATUS_MAP['paid']) {
             return false;
         }
 
@@ -243,7 +239,7 @@ class KomtetKassa{
         $queryOrder = DB::query("SELECT * FROM `".PREFIX."order` WHERE `number` = " .DB::quote($numberOrder));
         $order = DB::fetchAssoc($queryOrder);
 
-        $unhandledOrder = (!$mogutaOrder['paided'] and !$order['is_paid']);
+        $unhandledOrder = ($mogutaOrder['status_id'] != self::ORDER_STATUS_MAP['paid'] and !$order['is_paid']);
         $paidOrder = (
             $order['is_paid'] and $mogutaOrder['status_id'] != self::ORDER_STATUS_MAP['returned'] and
             $mogutaOrder['status_id'] != $pluginSettings['fullpayment_check_status']
@@ -396,7 +392,7 @@ class KomtetKassa{
         }
 
         $payment = new Payment(
-            $check_type == 'closed' && !$isReturning ? self::PAYMENTS_METHODS[self::PREPAYMENT] :
+            $checkType == 'closed' && !$isReturning ? self::PAYMENTS_METHODS[self::PREPAYMENT] :
                                                        self::PAYMENTS_METHODS[$paymentType],
             round((float)($mogutaOrder['delivery_cost'] + $mogutaOrder['summ']), 2));
         $check->addPayment($payment);
