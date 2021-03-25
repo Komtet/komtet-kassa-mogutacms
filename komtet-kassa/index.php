@@ -10,11 +10,21 @@ require PLUGIN_DIR.'komtet-kassa/lib/komtet-kassa-php-sdk/autoload.php';
 
 use Komtet\KassaSdk\CalculationMethod;
 use Komtet\KassaSdk\CalculationSubject;
+use Komtet\KassaSdk\Client;
+use Komtet\KassaSdk\QueueManager;
+use Komtet\KassaSdk\Check;
+use Komtet\KassaSdk\Payment;
+use Komtet\KassaSdk\Position;
+use Komtet\KassaSdk\Vat;
+use Komtet\KassaSdk\Exception\SdkException;
 
 new KomtetKassa;
 
 class KomtetKassa{
 
+    const CARD = 'Безналичный рассчет';
+    const CASH = 'Наличный рассчет';
+    const PREPAYMENT = 'Предоплата';
     const CLOSED = 'closed';
     const ORDER_STATUS_MAP = array(
         'not_confirm' => '0',
@@ -35,7 +45,11 @@ class KomtetKassa{
         self::CLOSED => CalculationSubject::PRODUCT,
         CalculationMethod::FULL_PAYMENT => CalculationSubject::PRODUCT,
     );
-
+    const PAYMENTS_METHODS = array(
+        self::CARD => Payment::TYPE_CARD,
+        self::CASH => Payment::TYPE_CASH,
+        self::PREPAYMENT => Payment::TYPE_PREPAYMENT,
+    );
     private static $pluginName = '';
     private static $path = '';
 
@@ -94,10 +108,8 @@ class KomtetKassa{
         DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `is_fiscalized` TINYINT(1) NOT NULL DEFAULT 0 AFTER `check_type`", $noError = true);
         DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `is_paid` TINYINT(1) NOT NULL DEFAULT 0 AFTER `is_fiscalized`", $noError = true);
         DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `fulfillment_status_id` INT(11) AFTER `is_paid`", $noError = true);
-        DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `request` JSON", $noError = true);
-        DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `response` JSON AFTER `request`", $noError = true);
-
-
+        DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `request` TEXT", $noError = true);
+        DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `response` TEXT AFTER `request`", $noError = true);
 
         DB::query("
           CREATE TABLE IF NOT EXISTS `".PREFIX."komtet_kassa_reports` (
@@ -171,21 +183,22 @@ class KomtetKassa{
         */
         $orderId = $args['origResult']['id'];
         $mogutaOrder = $args['args'][0];
+        $pluginSettings = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
 
-        if (!$mogutaOrder['paided']) {
+        if (!$mogutaOrder['paided'] && $mogutaOrder['status_id'] != self::ORDER_STATUS_MAP['paid']) {
             return false;
         }
 
-         $paymentOptions  = unserialize(stripslashes(MG::getSetting('komtet-kassa-payment-option')));
-         foreach($paymentOptions as $payment) {
+        $paymentOptions  = unserialize(stripslashes(MG::getSetting('komtet-kassa-payment-option')));
+        foreach($paymentOptions as $payment) {
             if ($payment['payId'] == $mogutaOrder['payment_id']) {
                 $paymentType = $payment['option'];
 
                 break;
             }
-         }
+        }
 
-         if ($paymentType) {
+        if ($paymentType) {
             if (unserialize(stripslashes(MG::getSetting('komtet-kassa-option')))['is_prepayment_check'] == 'true') {
                 $checkType = CalculationMethod::PRE_PAYMENT_FULL;
             } else {
@@ -199,10 +212,7 @@ class KomtetKassa{
                 return false;
             }
 
-            try {
-                self::fiscalizeOrder($orderId, $mogutaOrder, $check, $checkType);
-            } catch (Exception $e) {
-                mg::loger("Ошибка при фискализации чека по заказу - ". $orderId);
+            if (!self::fiscalizeOrder($pluginSettings, $check)) {
                 return false;
             }
 
@@ -214,7 +224,12 @@ class KomtetKassa{
                  SET `check_type` = " .DB::quote($checkType) ."
                  WHERE `id` = " .DB::quoteInt($orderId)
             );
-         }
+            DB::query(
+                "UPDATE `".PREFIX."order`
+                 SET `fulfillment_status_id` = " .DB::quoteInt($mogutaOrder['status_id']) ."
+                 WHERE `id` = " .DB::quoteInt($orderId)
+            );
+        }
 
         return true;
     }
@@ -222,6 +237,7 @@ class KomtetKassa{
     static function updateOrder($args) {
         $mogutaOrder = $args['args'][0];
         $numberOrder = $mogutaOrder['number'];
+        $orderId = $args['args'][0]['id'];
 
         $pluginSettings = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
         $queryOrder = DB::query("SELECT * FROM `".PREFIX."order` WHERE `number` = " .DB::quote($numberOrder));
@@ -237,8 +253,11 @@ class KomtetKassa{
         $closedOrder = ($mogutaOrder['status_id'] == $pluginSettings['fullpayment_check_status'] and
                         $order['fulfillment_status_id'] == $pluginSettings['fullpayment_check_status']);
 
-
         if ($unhandledOrder or $paidOrder or $returnedOrder or $closedOrder) {
+            return false;
+        }
+
+        if ($mogutaOrder['status_id'] == self::ORDER_STATUS_MAP['returned'] && !$order['check_type']) {
             return false;
         }
 
@@ -261,21 +280,26 @@ class KomtetKassa{
                 }
             }
 
+            $isReturn = false;
+            if ($mogutaOrder['status_id'] == self::ORDER_STATUS_MAP['returned']) {
+                $isReturn = true;
+            }
+
             try {
                 $check = self::buildCheck(
-                    $order['id'], $mogutaOrder, $paymentType, $checkType,
-                    $mogutaOrder['status_id'] == self::ORDER_STATUS_MAP['returned']
+                    $orderId,
+                    $mogutaOrder,
+                    $paymentType,
+                    $isReturn ? $order['check_type'] : $checkType,
+                    $isReturn
                 );
             } catch (Exception $e) {
-                mg::loger("Ошибка при сборке чека по заказу - ". $order['id']);
+                mg::loger("Ошибка при сборке чека " . ($isReturn ? "Возврата" : "") . " по заказу - ". $order['id']);
+                return false;
             }
 
             if ($check) {
-                try {
-                    self::fiscalizeOrder($orderId, $mogutaOrder, $check, $checkType);
-                } catch (Exception $e) {
-                    mg::loger("Ошибка фискализации заказа. [Заказ - ".$order['id']."][Ответ - ".$e."]" );
-
+                if (!self::fiscalizeOrder($pluginSettings, $check)) {
                     return false;
                 }
 
@@ -314,14 +338,122 @@ class KomtetKassa{
         return true;
     }
 
-    static function buildCheck($orderId, $mogutaOrder, $paymentType, $checkType, $returning=false) {
+    /**
+     * Формирование чека
+     *
+     * Параметры:
+     *  orderId - идентификатор заказа;
+     *  mogutaOrder - заказ;
+     *  paymentType - тип оплаты (Наличный/безналичный рассчёт);
+     *  checkType - тип формируемого чека;
+     *  isReturning - возврат.
+     *
+     */
+    static function buildCheck($orderId, $mogutaOrder, $paymentType, $checkType, $isReturning=false) {
+        $user = ($mogutaOrder['contact_email']) ? $mogutaOrder['contact_email'] : $mogutaOrder['phone'];
+        $pluginSettings = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
 
-        return true;
+        if (!$isReturning) {
+            $check = Check::createSell($orderId, $user, (int)$pluginSettings['sno']);
+        } else {
+            $check = Check::createSellReturn($orderId, $user, (int)$pluginSettings['sno']);
+        }
+
+        $print_check = ($pluginSettings['is_print'] === 'true');
+        $check->setShouldPrint($print_check); // печать чека на ккт
+
+        $unserializePositions = unserialize(stripslashes($mogutaOrder['order_content']));
+        if ($unserializePositions) {
+            $mogutaOrder['order_content'] = $unserializePositions;
+        }
+
+        foreach ($mogutaOrder['order_content'] as $orderItem) {
+            $vat = new Vat($pluginSettings['vat']);
+            $position = self::generatePosition($orderItem, $orderItem['count'], $vat, $checkType);
+            $check->addPosition($position);
+        }
+
+        if ((float)$mogutaOrder['delivery_cost'] > 0) {
+            $vatDelivery = new Vat($pluginSettings['vat_delivery']);
+            $queryOrder = DB::query(
+                "SELECT *
+                 FROM `".PREFIX."delivery`
+                 WHERE `id` = " .DB::quote($mogutaOrder['delivery_id'])
+            );
+            $delivery = DB::fetchAssoc($queryOrder);
+
+            $positionDelivery = new Position(
+                "Доставка " . $delivery['name'],
+                round($mogutaOrder['delivery_cost'], 2),
+                1,
+                round($mogutaOrder['delivery_cost'], 2),
+                $vatDelivery
+            );
+            $positionDelivery->setId($delivery['id']);
+            $positionDelivery->setCalculationMethod(self::CALCULATION_METHOD[$checkType]);
+            $positionDelivery->setCalculationSubject(self::CALCULATION_SUBJECT[$checkType]);
+            $check->addPosition($positionDelivery);
+        }
+
+        $payment = new Payment(
+            $check_type == 'closed' && !$isReturning ? self::PAYMENTS_METHODS[self::PREPAYMENT] :
+                                                       self::PAYMENTS_METHODS[$paymentType],
+            round((float)($mogutaOrder['delivery_cost'] + $mogutaOrder['summ']), 2));
+        $check->addPayment($payment);
+
+        return $check;
     }
 
-    static function fiscalizeOrder($orderId, $mogutaOrder, $check, $checkType) {
+    private static function generatePosition($item, $quantity, $vat, $checkType) {
+        $itemTotal = $item['price'] * $quantity;
 
-        return true;
+        if ($item['count'] != $quantity) {
+            $itemTotal = $itemTotal - $item['discount']/$item['count'];
+        } else {
+            $itemTotal = $itemTotal - $item['discount'];
+        }
+
+        $position = new Position(
+            $item['name'],
+            round($item['price'], 2),
+            round($item['count'], 2),
+            round($itemTotal, 2),
+            $vat
+        );
+        $position->setId($item['id']);
+        $position->setCalculationMethod(self::CALCULATION_METHOD[$checkType]);
+        $position->setCalculationSubject(self::CALCULATION_SUBJECT[$checkType]);
+
+        return $position;
     }
 
+    static function fiscalizeOrder($pluginSettings, $check) {
+        $client = new Client($pluginSettings['shop_id'], $pluginSettings['secret']);
+        $manager = new QueueManager($client);
+
+        $manager->registerQueue('ss-queue', $pluginSettings['queue_id']);
+
+        try {
+            return $manager->putCheck($check, 'ss-queue');
+        } catch (Exception $e) {
+            mg::loger(
+                "Ошибка фискализации заказа.
+                 [Ответ - ".$e->getMessage().". ".$e->getDescription()."]
+                 [Код КК - ".$e->getVLDCode()."]"
+            );
+            DB::query(
+                "UPDATE `".PREFIX."order`
+                 SET `request` = " .DB::quote(serialize($check->asArray()))."
+                 WHERE `id` = " .DB::quoteInt($check->asArray()['external_id'])
+            );
+
+            DB::query(
+                "UPDATE `".PREFIX."order`
+                 SET `response` = " .DB::quote($e->getMessage().". ".$e->getDescription()) ."
+                 WHERE `id` = " .DB::quoteInt($check->asArray()['external_id'])
+            );
+
+            return false;
+        }
+    }
 }

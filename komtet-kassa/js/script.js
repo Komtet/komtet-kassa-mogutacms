@@ -27,12 +27,14 @@ var komtetKassaModule = (function() {
               secret : $('.base-settings-open input[name=secret]').val(),
               queue_id : $('.base-settings-open input[name=queue_id]').val(),
               sno : $('.base-settings-open select[name=sno]').val(),
+              vat : $('.base-settings-open select[name=vat]').val(),
+              vat_delivery : $('.base-settings-open select[name=vat_delivery]').val(),
               is_print : $('.base-settings-open input[name=is_print]').prop('checked'),
               payments: komtetKassaModule.listOfPayments,
 
               prepayment_check_status : prepaymentStatus,
               fullpayment_check_status : $('.base-settings-open select[name=fullpayment_check_status]').val(),
-              is_prepayment_check: is_prepayment_check,
+              is_prepayment_check: is_prepayment_check
             },
           },
           dataType: 'json',
