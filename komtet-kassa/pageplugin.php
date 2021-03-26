@@ -83,13 +83,13 @@
 	    </div>
 	  </div>
 
-	  <div class="row">
+	  <div class="row checkbox-field-margin">
 	    <div class="large-6 columns dashed">
 	      <span>Печатать чек:</span>
 		</div>
 
 		<div class="large-6 columns margin">
-		  <input type="checkbox" name="is_print" id="isPrint" <?php echo ($options['is_print']=='true'?'checked':'') ?>>
+		  <input class="checkbox-margin" type="checkbox" name="is_print" id="isPrint" <?php echo ($options['is_print']=='true'?'checked':'') ?>>
 		  <label for="isPrint"></label>
 		</div>
 	  </div>
