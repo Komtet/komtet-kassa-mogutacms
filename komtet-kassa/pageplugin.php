@@ -116,6 +116,7 @@
 
 		<div class="large-6 columns checkbox margin">
 		  <select name="fullpayment_check_status" id="fullpayment_check_status" onfocus="selectedFullpaymentStatus()">
+		    <option value='false' <?php echo ($options['fullpayment_check_status'] == 'false' ? 'selected' : ''); ?>>Не выдавать</option>
 		    <option value='paid' id='paid' <?php echo ($options['fullpayment_check_status'] == 'paid' ? 'selected' : ''); ?>>Оплачен</option>
 		    <option value=3 id='shipped' <?php echo ($options['fullpayment_check_status'] == 3 ? 'selected' : ''); ?>>В доставке</option>
 		    <option value=5 id='delivered' <?php echo ($options['fullpayment_check_status'] == 5 ? 'selected' : ''); ?>>Выполнен</option>
