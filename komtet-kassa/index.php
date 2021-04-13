@@ -100,22 +100,30 @@ class KomtetKassa{
 
     static function createDateBase() {
 
-        DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `check_type` VARCHAR(25) AFTER `pay_date`", $noError = true);
-        DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `is_fiscalized` TINYINT(1) NOT NULL DEFAULT 0 AFTER `check_type`", $noError = true);
-        DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `is_paid` TINYINT(1) NOT NULL DEFAULT 0 AFTER `is_fiscalized`", $noError = true);
-        DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `fulfillment_status_id` INT(11) AFTER `is_paid`", $noError = true);
-        DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `request` TEXT", $noError = true);
-        DB::query("ALTER TABLE `".PREFIX.order."` ADD COLUMN `response` TEXT AFTER `request`", $noError = true);
+        DB::query("
+          CREATE TABLE IF NOT EXISTS `".PREFIX."kk_order` (
+            `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'Порядковый номер',
+            `order_id` INT NOT NULL UNIQUE COMMENT 'Идентификатор заказа',
+            `check_type` VARCHAR(25) COMMENT 'Тип выданного чека',
+            `is_paid` TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Флаг оплаты заказа',
+            `fulfillment_status_id` INT COMMENT 'Идентификатор статуса выданного чека',
+            `request` TEXT,
+            `response` TEXT,
+
+            PRIMARY KEY (`id`)
+          ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+        ");
 
         DB::query("
-          CREATE TABLE IF NOT EXISTS `".PREFIX."komtet_kassa_reports` (
+          CREATE TABLE IF NOT EXISTS `".PREFIX."kk_report` (
             `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Порядковый номер записи',
             `order_id` int(11) NOT NULL,
             `fisc_state` varchar(255) COMMENT 'Состояние задачи',
             `error_description` varchar(255) COMMENT 'Описание возникшей ошибки',
 
             PRIMARY KEY (`id`)
-          ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;");
+          ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+        ");
     }
 
     /**
@@ -212,19 +220,16 @@ class KomtetKassa{
                 return false;
             }
 
-            DB::query(
-                "UPDATE `".PREFIX."order` SET `is_paid` = " .DB::quoteInt(1) ."WHERE `id` = " .DB::quoteInt($orderId)
-            );
-            DB::query(
-                "UPDATE `".PREFIX."order`
-                 SET `check_type` = " .DB::quote($checkType) ."
-                 WHERE `id` = " .DB::quoteInt($orderId)
-            );
-            DB::query(
-                "UPDATE `".PREFIX."order`
-                 SET `fulfillment_status_id` = " .DB::quoteInt($mogutaOrder['status_id']) ."
-                 WHERE `id` = " .DB::quoteInt($orderId)
-            );
+            DB::query("
+                INSERT IGNORE INTO `".PREFIX."kk_order` (`order_id`, `check_type`, `is_paid`, `fulfillment_status_id`)
+                VALUES (
+                  ".DB::quoteInt($orderId).",
+                  ".DB::quote($checkType).",
+                  ".DB::quoteInt(1).",
+                  ".DB::quoteInt($mogutaOrder['status_id'])."
+                )
+            ");
+
         }
 
         return true;
@@ -236,7 +241,15 @@ class KomtetKassa{
         $orderId = $args['args'][0]['id'];
 
         $pluginSettings = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
-        $queryOrder = DB::query("SELECT * FROM `".PREFIX."order` WHERE `number` = " .DB::quote($numberOrder));
+        $queryOrder = DB::query("SELECT * FROM `".PREFIX."kk_order` WHERE `order_id` = " .DB::quote($orderId));
+        if (!$queryOrder->num_rows) {
+            DB::query("
+                INSERT IGNORE INTO `".PREFIX."kk_order` (`order_id`)
+                VALUES (
+                  ".DB::quoteInt($orderId)."
+                )
+            ");
+        }
         $order = DB::fetchAssoc($queryOrder);
 
         $unhandledOrder = ($mogutaOrder['status_id'] != self::ORDER_STATUS_MAP['paid'] and !$order['is_paid']);
@@ -300,32 +313,32 @@ class KomtetKassa{
                 }
 
                 DB::query(
-                    "UPDATE `".PREFIX."order`
+                    "UPDATE `".PREFIX."kk_order`
                      SET `is_paid` = " .DB::quoteInt(1) ."
-                     WHERE `id` = " .DB::quoteInt($order['id'])
+                     WHERE `order_id` = " .DB::quoteInt($orderId)
                 );
 
                 if ($checkType != CalculationMethod::PRE_PAYMENT_FULL or
                     $mogutaOrder['status_id'] == self::ORDER_STATUS_MAP['returned']) {
 
                     DB::query(
-                        "UPDATE `".PREFIX."order`
+                        "UPDATE `".PREFIX."kk_order`
                          SET `fulfillment_status_id` = " .DB::quoteInt($mogutaOrder['status_id']) ."
-                         WHERE `id` = " .DB::quoteInt($order['id'])
+                         WHERE `order_id` = " .DB::quoteInt($orderId)
                     );
                 }
 
                 if ($mogutaOrder['status_id'] == self::ORDER_STATUS_MAP['returned']) {
                     DB::query(
-                        "UPDATE `".PREFIX."order`
+                        "UPDATE `".PREFIX."kk_order`
                          SET `check_type` = " .DB::quote($order['check_type']) ."
-                         WHERE `id` = " .DB::quoteInt($order['id'])
+                         WHERE `order_id` = " .DB::quoteInt($orderId)
                     );
                 } else {
                     DB::query(
-                        "UPDATE `".PREFIX."order`
+                        "UPDATE `".PREFIX."kk_order`
                          SET `check_type` = " .DB::quote($checkType) ."
-                         WHERE `id` = " .DB::quoteInt($order['id'])
+                         WHERE `order_id` = " .DB::quoteInt($orderId)
                     );
                 }
             }
@@ -437,16 +450,16 @@ class KomtetKassa{
                  [Ответ - ".$e->getMessage().". ".$e->getDescription()."]
                  [Код КК - ".$e->getVLDCode()."]"
             );
-            DB::query(
-                "UPDATE `".PREFIX."order`
-                 SET `request` = " .DB::quote(serialize($check->asArray()))."
-                 WHERE `id` = " .DB::quoteInt($check->asArray()['external_id'])
-            );
 
             DB::query(
-                "UPDATE `".PREFIX."order`
+                "UPDATE `".PREFIX."kk_order`
+                 SET `request` = " .DB::quote(serialize($check->asArray()))."
+                 WHERE `order_id` = " .DB::quoteInt($check->asArray()['external_id'])
+            );
+            DB::query(
+                "UPDATE `".PREFIX."kk_order`
                  SET `response` = " .DB::quote($e->getMessage().". ".$e->getDescription()) ."
-                 WHERE `id` = " .DB::quoteInt($check->asArray()['external_id'])
+                 WHERE `order_id` = " .DB::quoteInt($check->asArray()['external_id'])
             );
 
             return false;
