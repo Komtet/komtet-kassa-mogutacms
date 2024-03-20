@@ -3,7 +3,7 @@
 	Plugin Name: Онлайн касса КОМТЕТ Касса
 	Description: Плагин для отправки электронных чеков и фискализации по 54-ФЗ
 	Author: КОМТЕТ Касса
-	Version: 1.0.0
+	Version: 1.2.0
 */
 
 require PLUGIN_DIR.'komtet-kassa/lib/komtet-kassa-php-sdk/autoload.php';
@@ -158,7 +158,7 @@ class KomtetKassa{
             $paymentVariants[$row['id']] = [
                 'id' => $row['id'],
                 'name' => $row['name'],
-                'hash' => md5($row['name'])
+                'hash' => md5($row['name'].$row['id'])
             ];
         }
 
@@ -185,10 +185,11 @@ class KomtetKassa{
         *   - созданный заказ оплачен(установлен флаг "Оплачен");
         *   - способ оплаты совпадает с выбранными настройками на странице плагина.
         */
-        $orderId = $args['origResult']['id'];
         $mogutaOrder = $args['args'][0];
-        $pluginSettings = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
+        $orderId = $args['origResult']['id'];
+        $orderNumber = $mogutaOrder['number'];
 
+        $pluginSettings = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
         if ($mogutaOrder['status_id'] != self::ORDER_STATUS_MAP['paid']) {
             return false;
         }
@@ -210,9 +211,9 @@ class KomtetKassa{
             }
 
             try {
-                $check = self::buildCheck($orderId, $mogutaOrder, $paymentType, $checkType);
+                $check = self::buildCheck($orderNumber, $mogutaOrder, $paymentType, $checkType);
             } catch (Exception $e) {
-                mg::loger("Ошибка при сборке чека по заказу - ". $orderId);
+                MG::loger("Ошибка при сборке чека по заказу № - ". $orderNumber. ', id - ' . $orderId);
                 return false;
             }
 
@@ -237,8 +238,8 @@ class KomtetKassa{
 
     static function updateOrder($args) {
         $mogutaOrder = $args['args'][0];
-        $numberOrder = $mogutaOrder['number'];
         $orderId = $args['args'][0]['id'];
+        $orderNumber = $mogutaOrder['number'];
 
         $pluginSettings = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
         $queryOrder = DB::query("SELECT * FROM `".PREFIX."kk_order` WHERE `order_id` = " .DB::quote($orderId));
@@ -296,14 +297,14 @@ class KomtetKassa{
 
             try {
                 $check = self::buildCheck(
-                    $orderId,
+                    $orderNumber,
                     $mogutaOrder,
                     $paymentType,
                     $isReturn ? $order['check_type'] : $checkType,
                     $isReturn
                 );
             } catch (Exception $e) {
-                mg::loger("Ошибка при сборке чека " . ($isReturn ? "Возврата" : "") . " по заказу - ". $order['id']);
+                MG::loger("Ошибка при сборке чека " . ($isReturn ? "Возврата" : "") . " по заказу№ - ". $orderNumber. ', id - ' . $orderId);
                 return false;
             }
 
@@ -351,21 +352,21 @@ class KomtetKassa{
      * Формирование чека
      *
      * Параметры:
-     *  orderId - идентификатор заказа;
+     *  orderNumber - внутренний номер заказа;
      *  mogutaOrder - заказ;
      *  paymentType - тип оплаты (Наличный/безналичный рассчёт);
      *  checkType - тип формируемого чека;
      *  isReturning - возврат.
      *
      */
-    static function buildCheck($orderId, $mogutaOrder, $paymentType, $checkType, $isReturning=false) {
+    static function buildCheck($orderNumber, $mogutaOrder, $paymentType, $checkType, $isReturning=false) {
         $user = ($mogutaOrder['contact_email']) ? $mogutaOrder['contact_email'] : $mogutaOrder['phone'];
         $pluginSettings = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
 
         if (!$isReturning) {
-            $check = Check::createSell($orderId, $user, (int)$pluginSettings['sno']);
+            $check = Check::createSell($orderNumber, $user, (int)$pluginSettings['sno']);
         } else {
-            $check = Check::createSellReturn($orderId, $user, (int)$pluginSettings['sno']);
+            $check = Check::createSellReturn($orderNumber, $user, (int)$pluginSettings['sno']);
         }
 
         $print_check = ($pluginSettings['is_print'] === 'true');
@@ -445,7 +446,7 @@ class KomtetKassa{
         try {
             return $manager->putCheck($check, 'ss-queue');
         } catch (Exception $e) {
-            mg::loger(
+            MG::loger(
                 "Ошибка фискализации заказа.
                  [Ответ - ".$e->getMessage().". ".$e->getDescription()."]
                  [Код КК - ".$e->getVLDCode()."]"

@@ -9,9 +9,9 @@ if(file_exists('.htaccess')) {
 }
 header('Content-Type: text/html; charset=utf-8');
 /*
-*	Скрипт для автоматической распаковки файлов системы на хостинге.
-*	Проверяет наличие обязательных расширений php, выдает пользователю предупреждение или ошибку в зависимости от критичности отсутствующего расширения.
-*	После распаковки архива удаляет его, и переходит на вторй шаг инсталятора - "условия использования".
+*   Скрипт для автоматической распаковки файлов системы на хостинге.
+*   Проверяет наличие обязательных расширений php, выдает пользователю предупреждение или ошибку в зависимости от критичности отсутствующего расширения.
+*   После распаковки архива удаляет его, и переходит на вторй шаг инсталятора - "условия использования".
 */ 
 if(!empty($_REQUEST['step'])){
   if($_REQUEST['step']=='upload'){
@@ -29,58 +29,49 @@ if(!empty($_REQUEST['step'])){
 <title>Moguta.CMS | Установка</title>
 <style type="text/css">
 html{padding:0px;margin:0px;height:100%;}
-a{	color: #1198D2;	}
-a:hover{	text-decoration: none;	}
+a{  color: #1198D2; }
+a:hover{    text-decoration: none;  }
 body {
-    background-image: url('data:image/jpeg;base64, iVBORw0KGgoAAAANSUhEUgAAAAoAAAAICAYAAADA+m62AAAAI0lEQVR42mNgwAS8DEQAXmIU8xJjMi8xmnmJdA4DKW6nIgAAaJ8Ag/Qo5GUAAAAASUVORK5CYII=');
+    background-color: #eee;
     padding: 0px;
     margin: 0px;
     font-family: Tahoma,  Verdana,  sans-serif;
     font-size: 14px;
 }
-
 .clearfix::before,
 .clearfix::after {
     content: ' ';
     display: table;
 }
-
 .clearfix::after {
     clear: both;
 }
-
-.alert{	vertical-align: -3px;}
+.alert{ vertical-align: -3px;}
 .feature-list .notify, .feature-list .error{
-	display: inline-block;
-	padding: 5px 10px;
-	font-size: 12px;
-	margin: 0 0 0 5px;
+    display: inline-block;
+    padding: 5px 10px;
+    font-size: 12px;
+    margin: 0 0 0 5px;
 }
-
 .agree-blok {
     padding: 15px 20px;
     border-top: 1px solid #ddd;
     text-align: right;
     margin: 0 -20px -20px -20px;
 }
-
 .agree-blok label {
     display: inline-block;
 }
-
 .feature-list {
     padding: 0;
     list-style: none;
 }
-
 .feature-list li {
     margin: 0 0 10px 0;
 }
-
 .clear {
     clear: both;
 }
-
 .start-install{
     display: inline-block;
     cursor: pointer;
@@ -101,80 +92,72 @@ body {
     color: #666;
     text-decoration: none;
 }
-
 .start-install:hover{
-		background: #eeeeee; /* Old browsers */
-        background: -moz-linear-gradient(top, #eeeeee 0%, #eeeeee 100%); /* FF3.6+ */
-        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#eeeeee), color-stop(100%,#eeeeee)); /* Chrome,Safari4+ */
-        background: -webkit-linear-gradient(top, #eeeeee 0%,#eeeeee 100%); /* Chrome10+,Safari5.1+ */
-        background: -o-linear-gradient(top, #eeeeee 0%,#eeeeee 100%); /* Opera11.10+ */
-        background: -ms-linear-gradient(top, #eeeeee 0%,#eeeeee 100%); /* IE10+ */
-		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#eeeeee',GradientType=0 ); /* IE6-9 */
-        background: linear-gradient(top, #eeeeee 0%,#eeeeee 100%); 
-		outline:none;/* W3C */
+    background: #eeeeee; /* Old browsers */
+    background: -moz-linear-gradient(top, #eeeeee 0%, #eeeeee 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#eeeeee), color-stop(100%,#eeeeee)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #eeeeee 0%,#eeeeee 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #eeeeee 0%,#eeeeee 100%); /* Opera11.10+ */
+    background: -ms-linear-gradient(top, #eeeeee 0%,#eeeeee 100%); /* IE10+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#eeeeee',GradientType=0 ); /* IE6-9 */
+    background: linear-gradient(top, #eeeeee 0%,#eeeeee 100%); 
+    outline:none;/* W3C */
 }
-
 .start-install:active{
     box-shadow: inset 0 0 13px 2px rgba(0,0,0,0.05);
     position: relative;
     top: 1px;
     outline: none;
 }
-
 .error{
-	display: block;
+    display: block;
     margin: 10px 0;
     padding:10px;
-	color:#c2646d;
-	background: #fdd6da;
-	border:1px solid #eca8a8;
-	text-align: center;
+    color:#c2646d;
+    background: #fdd6da;
+    text-align: center;
+    border-radius: 6px;
 }
-
 .install-text .error p {
     padding: 0;
     margin: 0;
 }
-
 .install-body {
     width: 980px;
     margin: 0 auto;
     height: 100%;
 }
-.install-body .logo {    margin: 15px 0;}
-
+.install-body .logo {
+    margin: 15px 0;
+}
 .center-wrapper {
     background: #fff;
     box-shadow: 0 0 8px rgba(0,0,0,.15);
     border: 1px solid #ddd;
     font-size: 14px;
 }
-
 .install-text {
     padding: 20px;
     color: #3E3E3E;
 }
-
 .install-text p {
     line-height: 22px;
     padding: 0;
     margin: 0 0 10px 0;
 }
-
 span.notify{
-	display: inline-block; 
-	color:#92862e;
-	border:1px solid #e1d260;
-	background:#fff6ae;
-	padding:10px;
-	margin:0 0 10px 0;
+    display: inline-block; 
+    color:#92862e;
+    background:#fff6ae;
+    padding:10px;
+    margin:0 0 10px 0;
+    border-radius: 6px;
 }
 span.error{
-	display: inline-block; 
-	padding:10px;
-	margin:0 0 10px 0;
+    display: inline-block; 
+    padding:10px;
+    margin:0 0 10px 0;
 }
-
 .start-install:active {
     -moz-box-shadow: 0 0 4px 2px rgba(0, 0, 0, .3) inset;
     -webkit-box-shadow: 0 0 4px 2px rgba(0, 0, 0, .3) inset;
@@ -183,31 +166,26 @@ span.error{
     top: 1px;
     outline: none;
 }
-
 .widget-table-title {
     background: #f5f5f5;
     border-bottom: 1px solid #ddd;
     padding: 15px 20px;
     font-size: 14px;
 }
-
 .widget-table-title .step-list{
     float: right;
     margin: -15px -20px -15px 0;
     padding: 0;
     list-style: none;
 }
-
 .widget-table-title .step-list li.passed{
     background: #6F6E6E;
     opacity: 0.3;
 }
-
 .widget-table-title .step-list li.active{
     color: #fff;
     background: #57AF57;
 }
-
 .widget-table-title .step-list li{
     float: left;
     width: 50px;
@@ -219,58 +197,216 @@ span.error{
     background: #fff;
     border-left: 1px solid #ddd;
 }
-
 .widget-table-title h4 {
     float: left;
     margin: 0;
     font-size: 16px;
 }
-
 .install-text h2 {
     font-size: 14px;
 }
-
 div.note {
     background: beige;
     padding: 0 10px;
     border-width: 2px;
     border-style: solid;
 }
-
 div.note.error {
     border-color: #ff0033;
     color: #ff0033;
 }
-
 div.note.warning {
     border-color: #226a66;
     color: #226a66;
     margin-bottom: 10px;
 }
-
 div.note.ok {
     border-color: #1ec547;
     color: #1ec547;
 }
-
 img.er {
     vertical-align: -2px;
 }
-div.image-block{text-align:center;}
-.opacity{opacity:0.5;filter: alpha(opacity=50);}
+div.image-block {
+    text-align:center;
+}
+.opacity {
+    opacity:0.5;
+    filter: alpha(opacity=50);
+}
+
+/* NEW STYLES */
+a {
+    text-decoration: none;
+}
+.image-block svg {
+    max-height: 60px;
+    margin: 20px 0;
+}
+.edition-select {
+    font-size: 16px;
+    padding: 5px 10px;
+    border-radius: 6px;
+}
+.edition-select:focus-visible {
+    border-color: #05A95C;
+}
+.center-wrapper {
+    border-radius: 12px;
+}
+.widget-table-title {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+.step-list .last {
+    border-top-right-radius: 12px;
+}
+.start-install {
+    background: #05A95C;
+    border: unset;
+    border-radius: 6px;
+    color: #fff;
+}
+.start-install:hover {
+    background: #05A95C;
+}
+.widget-table-title .step-list li.active {
+    background: #05A95C;
+}
+.feature-list li img {
+    padding-bottom: 2px;
+}
+#agree {
+    margin: 0 3px;
+    vertical-align: middle;
+    height: 13px;
+}
+.select-hidden {
+    display: none;
+    visibility: hidden;
+    padding-right: 10px;
+}
+.select {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    font-size: 16px;
+    color: #000;
+    width: 170px;
+    height: 35px;
+    text-align: center;
+}
+.select-styled {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 7px 6px;
+    border-radius: 6px;
+    background: #05A95C;
+    color: #fff;
+}
+.select-styled:after {
+    content: "";
+    width: 0;
+    height: 0;
+    border: 7px solid transparent;
+    border-color: #fff transparent transparent transparent;
+    position: absolute;
+    top: 14px;
+    right: 10px;
+    transition: all 0.17s ease-in;
+}
+.select-styled:hover {
+    background-color: #05A95C;
+    opacity: 0.9;
+}
+.select-styled:active, .select-styled.active {
+    background-color: #05A95C;
+}
+.select-styled:active:after, .select-styled.active:after {
+    top: 8px;
+    border-color: transparent transparent #fff transparent;
+    transition: all 0.17s ease-in;
+}
+.select-options {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    z-index: 999;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background-color: #eee;
+    transition: all 1s ease-in;
+    margin-top: 3px;
+    overflow: hidden;
+    border-radius: 6px;
+    border: 1px solid #eee;
+    box-shadow: 0 0 8px rgba(0,0,0,.15);
+}
+.select-options li:first-child {
+    border-top-right-radius: 6px;
+    border-top-left-radius: 6px;
+    overflow: hidden;
+}
+.select-options li:nth-child(3) {
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    overflow: hidden;
+}
+.select-options li {
+    margin: 0;
+    padding: 10px 0;
+    overflow: hidden;
+    border-top: 1px solid #e5e2e2;
+}
+.select-options li:first-child {
+     border: unset;
+}
+.select-options li {
+    color: #787878;
+}
+.select-options li:hover, .select-options li.is-selected {
+    color: #000000;
+    background: #fff;
+}
+.select-options li[rel="hide"] {
+     display: none;
+}
+.sele-comparison {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+.comparison {
+    margin-left: 10px;
+}
+.feature-list li>svg.tick-margin {
+    margin-bottom: -1px;
+}
+.feature-list li>svg.warning-margin {
+    margin-bottom: -1px;
+}
+.feature-list li>svg.error-margin {
+    margin-bottom: -2px;
+}
 </style>
 <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 <script type="text/javascript">
 function upload(){
   document.getElementById('accept_license').style.display = 'none';
-	document.getElementById('button_start_upload').style.display = 'none';
-	document.getElementById('ajaxloader').style.display = 'block';
-	return false;
+    document.getElementById('button_start_upload').style.display = 'none';
+    document.getElementById('ajaxloader').style.display = 'block';
+    return false;
 }  
-	$(document).ready(function(){
-	  $('.start-install').prop('disabled', 'disabled');
-	  $('.start-install').addClass('opacity');	  
-	  $('#agree').change(function() {
+    $(document).ready(function(){
+      $('.start-install').prop('disabled', 'disabled');
+      $('.start-install').addClass('opacity');    
+      $('#agree').change(function() {
       var checkBox = $(this).prop('checked');
       if(checkBox){
         $('.start-install').removeClass('opacity');
@@ -278,191 +414,207 @@ function upload(){
       else{
         $('.start-install').addClass('opacity');
       }
-	  });
-	  $('#agree').change(function() {
-		  $('.start-install').prop('disabled', function(i, val) {
+      });
+      $('#agree').change(function() {
+          $('.start-install').prop('disabled', function(i, val) {
         return !val;
-		  })
-	  });
+          })
+      });
     $('#button_start_upload').on('click', function() {
      if (!$(this).hasClass('opacity')) {
         upload();
       }
-	  });
-	});
+      });
+    });
 </script>
 </head>
 <body>
 <?php $_SESSION = array();?>
 <div class="install-body">
 <div class="image-block"> 
-<img class="logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATsAAAAwCAYAAABubN2wAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJ
-bWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdp
-bj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6
-eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEz
-NDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJo
-dHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlw
-dGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEu
-MC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVz
-b3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1N
-Ok9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo5M0VCOEU0NzhCQTZFNjExQjQ1Q0Y0NzUzODkw
-QUMxRiIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo3ODk2NDkxMTY2MkMxMUU3QjlCNjkxNzJD
-Q0YyQkM0MyIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo3ODk2NDkxMDY2MkMxMUU3QjlCNjkx
-NzJDQ0YyQkM0MyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M2IChXaW5kb3dz
-KSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjk0RUI4RTQ3
-OEJBNkU2MTFCNDVDRjQ3NTM4OTBBQzFGIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjkzRUI4
-RTQ3OEJBNkU2MTFCNDVDRjQ3NTM4OTBBQzFGIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpS
-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">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+     width="996.938px" height="163.683px" viewBox="0 0 996.938 163.683" enable-background="new 0 0 996.938 163.683"
+     xml:space="preserve">
+<g>
+    <path fill="#414042" d="M96.05,18.079"/>
+    <path fill="#414042" d="M36.864,91.303L13.029,48.075c-1.01,7.744-2.02,15.487-3.03,23.23c4.848,12.053,9.696,24.105,14.544,36.158
+        l-13.18,32.572c-2.878,1.717-5.757,3.434-8.636,5.151c-0.909,2.322-1.818,4.646-2.727,6.969c0,0,18.18,0.101,27.27,0.151
+        c4.04-5.959,8.08-14.342,12.12-20.301c8.585-5.757,17.169-11.514,25.754-17.271C55.718,106.924,36.864,91.303,36.864,91.303z"/>
+    <path fill="#414042" d="M69.689,19.442c-4.949-2.239-9.898-4.478-14.847-6.717c-1.347-2.154-2.693-4.309-4.04-6.464
+        c-2.155-1.212-4.309-2.424-6.464-3.636c-2.828,1.885-5.656,3.771-8.484,5.656c-1.145,4.276-2.289,8.551-3.434,12.827
+        c5.909-0.909,17.726-2.727,17.726-2.727C56.66,18.735,63.175,19.089,69.689,19.442z"/>
+    <path fill="#414042" d="M145.742,142.308c-2.071,1.363-4.141,2.727-6.211,4.091c-0.758,2.07-1.515,4.141-2.272,6.211
+        c0,0,17.776,0.202,26.664,0.303c2.123-12.338,3.738-21.119,4.848-27.572c-1.752-3.699-3.505-7.399-5.257-11.098
+        c-11.615,1.291-23.23,2.581-34.846,3.872c2.809,4.143,5.705,8.328,8.689,12.552C140.158,134.631,145.742,142.308,145.742,142.308z"
+        />
+    <path fill="#414042" d="M101.049,25.351c-2.07-2.575-4.141-5.151-6.211-7.727c-6.935-2.575-13.871-5.151-20.806-7.726
+        c-0.673-2.087-1.347-4.175-2.02-6.262C70.531,2.424,69.049,1.212,67.568,0c-1.953,0.741-3.905,1.481-5.858,2.222
+        c-1.33,1.751-2.66,3.501-3.99,5.252c11.514,4.697,23.609,10.043,34.67,15.726c0,0,3.749,8.134,5.624,12.202
+        c5.43,0.892,10.86,1.784,16.291,2.676c0.53,0.631,1.061,1.262,1.591,1.894c-0.083,0.208-0.166,0.416-0.251,0.625
+        c-0.079,0.195-0.158,0.389-0.237,0.582l-3.704,1.849l2.69,2.777c-0.964,2.171-1.928,4.343-2.892,6.515
+        c-2.784,3.18-5.567,6.359-8.351,9.538c-4.698-0.766-9.396-1.532-14.094-2.297l4.171,4.471c-3.211,0.783-6.423,1.567-9.634,2.351
+        c-9.085-1.606-23.904-3.458-23.904-3.458l25.906,74.689c-3.131,2.272-6.262,4.545-9.393,6.817c-0.858,2.525-1.717,5.05-2.576,7.575
+        c0,0,20.334,0.067,30.502,0.101c2.424-7.878,7.272-24.239,7.272-24.239l-1.717-17.979l55.512-7.012c0,0,8.038-9.061,12.057-13.591
+        c-1.414,7.339-2.828,14.678-4.242,22.018c2.673,4.377,5.499,8.843,8.484,13.383c3.091,4.699,9.241,13.533,9.241,13.533
+        c-2.929,2.071-5.857,4.142-8.787,6.212c-1.094,2.693-2.188,5.387-3.282,8.08c0,0,22.287,0.27,33.43,0.403
+        c3.199-8.079,6.397-16.159,9.595-24.239c-0.572-18.18-1.145-33.33-1.717-51.51c3.131-0.101,6.262-0.202,9.393-0.303
+        c-5.656-10.605-11.312-21.21-16.968-31.815c-17.103-9.157-34.205-18.314-51.308-27.472
+        C141.079,20.166,121.064,22.758,101.049,25.351z"/>
+    <path fill="#414042" d="M77.626,32.213c2.775-1.204,5.55-2.409,8.325-3.613c0.864,2.046,1.728,4.092,2.592,6.138
+        C84.904,33.896,81.265,33.055,77.626,32.213z"/>
+</g>
+<g>
+    <path fill="#3FB761" d="M337.367,111.786V55.841l-22.522,55.945h-7.427l-22.522-55.945v55.945h-17.011V31.882h23.839l19.407,48.278
+        l19.407-48.278h23.96v79.904H337.367z"/>
+    <path fill="#3FB761" d="M364.086,71.894c0-24.079,17.61-41.33,41.689-41.33c24.198,0,41.809,17.251,41.809,41.33
+        s-17.61,41.33-41.809,41.33C381.696,113.224,364.086,95.973,364.086,71.894z M430.094,71.894c0-14.975-9.584-26.235-24.318-26.235
+        c-14.735,0-24.199,11.261-24.199,26.235c0,14.855,9.464,26.235,24.199,26.235C420.51,98.129,430.094,86.749,430.094,71.894z"/>
+    <path fill="#3FB761" d="M453.339,71.894c0-25.277,19.167-41.33,42.527-41.33c16.652,0,27.074,8.387,33.064,17.851l-14.136,7.667
+        c-3.595-5.631-10.423-10.423-18.929-10.423c-14.495,0-25.037,11.142-25.037,26.235c0,15.095,10.542,26.235,25.037,26.235
+        c7.068,0,13.777-3.114,17.012-6.109v-9.584h-21.084V67.581h38.095v30.668c-8.146,9.104-19.526,15.095-34.022,15.095
+        C472.506,113.344,453.339,97.051,453.339,71.894z"/>
+    <path fill="#3FB761" d="M541.032,79.92V31.882h17.251v47.439c0,11.141,6.469,18.808,18.809,18.808
+        c12.339,0,18.688-7.667,18.688-18.808V31.882h17.371v47.919c0,19.886-11.74,33.423-36.059,33.423
+        C552.772,113.224,541.032,99.566,541.032,79.92z"/>
+    <path fill="#3FB761" d="M644.898,111.786v-64.93h-23.36V31.882h63.731v14.975h-23.24v64.93H644.898z"/>
+    <path fill="#3FB761" d="M741.217,111.786l-4.911-13.537h-34.262l-5.032,13.537h-19.406l30.907-79.904h21.324l30.787,79.904H741.217
+        z M719.175,48.893l-12.459,34.382h24.918L719.175,48.893z"/>
+</g>
+<g>
+    <path fill="#414042" d="M770.395,71.894c0-24.558,17.85-41.33,40.491-41.33c12.698,0,22.282,5.631,29.11,14.137l-5.75,3.714
+        c-5.031-6.948-13.776-11.621-23.36-11.621c-18.808,0-33.304,14.256-33.304,35.101c0,20.605,14.496,35.101,33.304,35.101
+        c9.584,0,18.329-4.672,23.36-11.62l5.75,3.594c-7.067,8.745-16.412,14.256-29.11,14.256
+        C788.244,113.224,770.395,96.452,770.395,71.894z"/>
+    <path fill="#414042" d="M919.306,111.786V41.226l-29.11,70.561h-2.636l-29.23-70.561v70.561h-6.828V31.882h10.183l27.193,65.888
+        l27.074-65.888h10.303v79.904H919.306z"/>
+    <path fill="#414042" d="M939.315,100.525l4.433-5.151c5.151,5.99,13.537,11.62,24.918,11.62c16.412,0,21.084-9.104,21.084-15.933
+        c0-23.48-47.919-11.261-47.919-39.174c0-13.058,11.74-21.324,26.235-21.324c11.979,0,20.845,4.193,27.074,11.262l-4.553,5.031
+        c-5.75-6.948-13.896-10.063-22.881-10.063c-10.662,0-18.688,6.11-18.688,14.735c0,20.485,47.919,9.225,47.919,39.054
+        c0,10.303-6.828,22.642-28.392,22.642C955.368,113.224,945.425,107.952,939.315,100.525z"/>
+</g>
+<g>
+    <path fill="#3FB761" d="M267.483,144.063c0-6.448,4.237-11.654,11.007-11.654s11.008,5.206,11.008,11.654
+        c0,6.447-4.237,11.697-11.008,11.697S267.483,150.511,267.483,144.063z M285.859,144.063c0-4.514-2.625-8.567-7.369-8.567
+        c-4.744,0-7.415,4.054-7.415,8.567c0,4.56,2.671,8.612,7.415,8.612C283.234,152.676,285.859,148.623,285.859,144.063z"/>
+    <path fill="#3FB761" d="M293.83,144.063c0-6.587,4.467-11.654,11.1-11.654c4.053,0,6.448,1.659,8.152,3.87l-2.302,2.118
+        c-1.474-2.026-3.362-2.901-5.666-2.901c-4.744,0-7.691,3.638-7.691,8.567c0,4.928,2.948,8.612,7.691,8.612
+        c2.303,0,4.191-0.922,5.666-2.902l2.302,2.118c-1.704,2.212-4.099,3.869-8.152,3.869
+        C298.297,155.761,293.83,150.694,293.83,144.063z"/>
+    <path fill="#3FB761" d="M317.919,155.208v-22.245h3.454v9.258h11.607v-9.258h3.454v22.245h-3.454v-9.947h-11.607v9.947H317.919z"/>
+    <path fill="#3FB761" d="M342.055,144.063c0-6.448,4.237-11.654,11.007-11.654c6.77,0,11.007,5.206,11.007,11.654
+        c0,6.447-4.237,11.697-11.007,11.697C346.292,155.761,342.055,150.511,342.055,144.063z M360.431,144.063
+        c0-4.514-2.625-8.567-7.369-8.567c-4.744,0-7.415,4.054-7.415,8.567c0,4.56,2.671,8.612,7.415,8.612
+        C357.806,152.676,360.431,148.623,360.431,144.063z"/>
+    <path fill="#3FB761" d="M369.69,155.208v-22.245h12.251c3.915,0,6.264,2.349,6.264,5.711c0,2.672-1.704,4.467-3.592,5.066
+        c2.257,0.553,4.053,2.901,4.053,5.436c0,3.591-2.395,6.032-6.494,6.032H369.69z M384.659,139.181c0-1.935-1.197-3.178-3.316-3.178
+        h-8.198v6.264h8.198C383.508,142.267,384.659,140.931,384.659,139.181z M385.074,148.76c0-1.796-1.244-3.454-3.593-3.454h-8.336
+        v6.863h8.336C383.692,152.169,385.074,150.879,385.074,148.76z"/>
+    <path fill="#3FB761" d="M409.117,155.208v-2.532c-1.842,2.025-4.375,3.085-7.369,3.085c-3.776,0-7.783-2.532-7.783-7.368
+        c0-4.976,4.007-7.323,7.783-7.323c3.04,0,5.573,0.967,7.369,3.04v-4.008c0-2.993-2.395-4.698-5.619-4.698
+        c-2.671,0-4.836,0.968-6.817,3.087l-1.611-2.396c2.395-2.486,5.25-3.686,8.889-3.686c4.698,0,8.612,2.12,8.612,7.508v15.291
+        H409.117z M409.117,150.511v-4.191c-1.335-1.843-3.685-2.763-6.125-2.763c-3.224,0-5.481,2.025-5.481,4.882
+        c0,2.809,2.257,4.836,5.481,4.836C405.433,153.274,407.782,152.354,409.117,150.511z"/>
+    <path fill="#3FB761" d="M431.365,155.208v-22.245h12.251c3.915,0,6.264,2.349,6.264,5.711c0,2.672-1.704,4.467-3.592,5.066
+        c2.257,0.553,4.053,2.901,4.053,5.436c0,3.591-2.395,6.032-6.494,6.032H431.365z M446.334,139.181c0-1.935-1.197-3.178-3.316-3.178
+        h-8.198v6.264h8.198C445.183,142.267,446.334,140.931,446.334,139.181z M446.749,148.76c0-1.796-1.244-3.454-3.593-3.454h-8.336
+        v6.863h8.336C445.367,152.169,446.749,150.879,446.749,148.76z"/>
+    <path fill="#3FB761" d="M470.792,155.208v-2.532c-1.843,2.025-4.376,3.085-7.369,3.085c-3.777,0-7.784-2.532-7.784-7.368
+        c0-4.976,4.007-7.323,7.784-7.323c3.039,0,5.573,0.967,7.369,3.04v-4.008c0-2.993-2.395-4.698-5.619-4.698
+        c-2.671,0-4.836,0.968-6.817,3.087l-1.611-2.396c2.395-2.486,5.25-3.686,8.889-3.686c4.698,0,8.612,2.12,8.612,7.508v15.291
+        H470.792z M470.792,150.511v-4.191c-1.336-1.843-3.685-2.763-6.126-2.763c-3.224,0-5.48,2.025-5.48,4.882
+        c0,2.809,2.256,4.836,5.48,4.836C467.107,153.274,469.456,152.354,470.792,150.511z"/>
+    <path fill="#3FB761" d="M510.311,132.963v22.245h-29.154v-22.245h3.455v19.206h9.396v-19.206h3.454v19.206h9.396v-19.206H510.311z"
+        />
+    <path fill="#3FB761" d="M515.933,144.063c0-6.448,4.604-11.654,10.961-11.654c6.725,0,10.685,5.252,10.685,11.931v0.874h-18.007
+        c0.276,4.191,3.224,7.692,8.014,7.692c2.532,0,5.112-1.015,6.862-2.811l1.657,2.258c-2.21,2.211-5.204,3.407-8.843,3.407
+        C520.676,155.761,515.933,151.018,515.933,144.063z M526.848,135.267c-4.744,0-7.093,4.007-7.276,7.414h14.6
+        C534.125,139.365,531.914,135.267,526.848,135.267z"/>
+    <path fill="#3FB761" d="M558.722,136.003h-12.113v19.205h-3.454v-22.245h15.567V136.003z"/>
+    <path fill="#3FB761" d="M561.946,144.063c0-6.448,4.237-11.654,11.008-11.654s11.008,5.206,11.008,11.654
+        c0,6.447-4.237,11.697-11.008,11.697S561.946,150.511,561.946,144.063z M580.323,144.063c0-4.514-2.626-8.567-7.369-8.567
+        c-4.744,0-7.415,4.054-7.415,8.567c0,4.56,2.671,8.612,7.415,8.612C577.697,152.676,580.323,148.623,580.323,144.063z"/>
+    <path fill="#3FB761" d="M601.466,155.208v-22.245h3.454v16.995l11.652-16.995h3.409v22.245h-3.454v-17.316l-11.745,17.316H601.466z
+        "/>
+    <path fill="#3FB761" d="M626.892,155.208v-22.245h3.454v9.258h11.606v-9.258h3.454v22.245h-3.454v-9.947h-11.606v9.947H626.892z"/>
+    <path fill="#3FB761" d="M656.369,155.208v-19.205h-6.447v-3.04h16.396v3.04h-6.494v19.205H656.369z"/>
+    <path fill="#3FB761" d="M669.543,144.063c0-6.448,4.605-11.654,10.962-11.654c6.725,0,10.685,5.252,10.685,11.931v0.874h-18.008
+        c0.276,4.191,3.225,7.692,8.014,7.692c2.533,0,5.112-1.015,6.863-2.811l1.657,2.258c-2.21,2.211-5.204,3.407-8.843,3.407
+        C674.286,155.761,669.543,151.018,669.543,144.063z M680.458,135.267c-4.743,0-7.093,4.007-7.276,7.414h14.601
+        C687.735,139.365,685.525,135.267,680.458,135.267z"/>
+    <path fill="#3FB761" d="M700.218,151.847v11.836h-3.454v-30.72h3.454v3.316c1.612-2.258,4.376-3.87,7.508-3.87
+        c5.85,0,9.903,4.423,9.903,11.654c0,7.184-4.054,11.697-9.903,11.697C704.686,155.761,702.015,154.333,700.218,151.847z
+         M713.99,144.063c0-4.93-2.672-8.567-7.14-8.567c-2.718,0-5.436,1.612-6.633,3.546v10.041c1.197,1.935,3.915,3.593,6.633,3.593
+        C711.318,152.676,713.99,148.991,713.99,144.063z"/>
+    <path fill="#3FB761" d="M723.111,155.208v-22.245h3.454v9.258h11.606v-9.258h3.454v22.245h-3.454v-9.947h-11.606v9.947H723.111z"/>
+    <path fill="#3FB761" d="M747.247,144.063c0-6.448,4.604-11.654,10.961-11.654c6.725,0,10.686,5.252,10.686,11.931v0.874h-18.008
+        c0.276,4.191,3.224,7.692,8.014,7.692c2.533,0,5.112-1.015,6.862-2.811l1.658,2.258c-2.211,2.211-5.205,3.407-8.844,3.407
+        C751.99,155.761,747.247,151.018,747.247,144.063z M758.162,135.267c-4.743,0-7.093,4.007-7.276,7.414h14.6
+        C765.439,139.365,763.229,135.267,758.162,135.267z"/>
+    <path fill="#3FB761" d="M778.521,155.208v-19.205h-6.448v-3.04h16.396v3.04h-6.495v19.205H778.521z"/>
+    <path fill="#3FB761" d="M790.912,145.582v-3.039h11.053v3.039H790.912z"/>
+    <path fill="#3FB761" d="M826.055,155.208v-17.455l-7.232,17.455h-1.289l-7.277-17.455v17.455h-3.454v-22.245h4.56l6.816,16.489
+        l6.725-16.489h4.606v22.245H826.055z"/>
+    <path fill="#3FB761" d="M850.327,155.208v-2.532c-1.842,2.025-4.375,3.085-7.368,3.085c-3.776,0-7.784-2.532-7.784-7.368
+        c0-4.976,4.008-7.323,7.784-7.323c3.04,0,5.573,0.967,7.368,3.04v-4.008c0-2.993-2.395-4.698-5.618-4.698
+        c-2.672,0-4.837,0.968-6.816,3.087l-1.612-2.396c2.395-2.486,5.251-3.686,8.89-3.686c4.697,0,8.612,2.12,8.612,7.508v15.291
+        H850.327z M850.327,150.511v-4.191c-1.335-1.843-3.684-2.763-6.125-2.763c-3.224,0-5.48,2.025-5.48,4.882
+        c0,2.809,2.257,4.836,5.48,4.836C846.644,153.274,848.992,152.354,850.327,150.511z"/>
+    <path fill="#3FB761" d="M876.26,136.003h-12.113v19.205h-3.454v-22.245h15.567V136.003z"/>
+    <path fill="#3FB761" d="M894.685,155.208v-2.532c-1.843,2.025-4.375,3.085-7.369,3.085c-3.776,0-7.783-2.532-7.783-7.368
+        c0-4.976,4.007-7.323,7.783-7.323c3.04,0,5.573,0.967,7.369,3.04v-4.008c0-2.993-2.396-4.698-5.619-4.698
+        c-2.671,0-4.836,0.968-6.816,3.087l-1.612-2.396c2.396-2.486,5.251-3.686,8.89-3.686c4.698,0,8.613,2.12,8.613,7.508v15.291
+        H894.685z M894.685,150.511v-4.191c-1.336-1.843-3.685-2.763-6.126-2.763c-3.224,0-5.48,2.025-5.48,4.882
+        c0,2.809,2.257,4.836,5.48,4.836C891,153.274,893.349,152.354,894.685,150.511z"/>
+    <path fill="#3FB761" d="M902.884,152.123l1.705-2.211c2.071,1.979,5.02,2.994,8.335,2.994c3.961,0,6.541-1.521,6.541-3.87
+        c0-2.763-3.086-3.684-7.001-3.684h-4.975v-2.81h4.975c3.684,0,6.586-1.197,6.586-3.73c0-2.119-2.81-3.546-6.494-3.546
+        c-3.131,0-5.572,0.92-7.461,2.854l-1.797-2.118c2.073-2.118,5.066-3.547,9.12-3.547c5.987-0.047,10.225,2.165,10.225,5.941
+        c0,3.316-3.362,5.112-5.987,5.436c2.578,0.184,6.447,1.749,6.447,5.435c0,3.73-3.776,6.493-10.179,6.493
+        C908.457,155.761,905.095,154.333,902.884,152.123z"/>
+    <path fill="#3FB761" d="M928.724,155.208v-22.245h3.454v16.995l11.652-16.995h3.408v22.245h-3.454v-17.316l-11.745,17.316H928.724z
+        "/>
+    <path fill="#3FB761" d="M954.148,155.208v-22.245h3.454v9.258h11.606v-9.258h3.454v22.245h-3.454v-9.947h-11.606v9.947H954.148z"/>
+    <path fill="#3FB761" d="M993.482,155.208v-2.532c-1.842,2.025-4.375,3.085-7.369,3.085c-3.775,0-7.783-2.532-7.783-7.368
+        c0-4.976,4.008-7.323,7.783-7.323c3.041,0,5.573,0.967,7.369,3.04v-4.008c0-2.993-2.395-4.698-5.619-4.698
+        c-2.671,0-4.836,0.968-6.816,3.087l-1.611-2.396c2.395-2.486,5.25-3.686,8.889-3.686c4.698,0,8.613,2.12,8.613,7.508v15.291
+        H993.482z M993.482,150.511v-4.191c-1.336-1.843-3.684-2.763-6.125-2.763c-3.225,0-5.48,2.025-5.48,4.882
+        c0,2.809,2.256,4.836,5.48,4.836C989.799,153.274,992.146,152.354,993.482,150.511z"/>
+</g>
+</svg>
 </div>  
 <div class="center-wrapper step2">
-		<div class="widget-table-title clearfix">
-			<h4 class="product-table-icon">Добро пожаловать в мастер установки Moguta.CMS</h4>
+        <div class="widget-table-title clearfix">
+            <h4 class="product-table-icon">Добро пожаловать в мастер установки Moguta.CMS</h4>
             <ul class="step-list">
                 <li class="step-number active">шаг 1</li>
                 <li class="step-number">2</li>
                 <li class="step-number ">3</li>
                 <li class="step-number last">4</li>
             </ul>
-		</div>
-		<div class="install-text">
+        </div>
+        <div class="install-text">
       <?php install();?>
-			<div class="clear"></div>
-		</div>
-	</div>
+            <div class="clear"></div>
+        </div>
+    </div>
 </div>
 </body>
 </html>
 <?php
 //  Установка
 function install(){
-	testserver();
-  checkLaunchingInstall("launching");   
+    testserver();
+//   checkLaunchingInstall("launching");   
 }
 //  Проверка сервера
 function testserver(){
-	  //phpinfo();
+      //phpinfo();
   $err = false;
   $requireList = array();
   $desireList = array();
   $memoryLimitWarning = '';
-  $sourceOk = '<img src="data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAICAYAAAAvOAWIAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MzRENEU4OTkzNEE0MTFFMjkyMDg4QkYwNDQ1ODEzNzUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MzRENEU4OUEzNEE0MTFFMjkyMDg4QkYwNDQ1ODEzNzUiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDozNEQ0RTg5NzM0QTQxMUUyOTIwODhCRjA0NDU4MTM3NSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDozNEQ0RTg5ODM0QTQxMUUyOTIwODhCRjA0NDU4MTM3NSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PljBVMgAAACaSURBVHjaYvz//z8DLtC4kZEdSB0D4u9A7MxCQOFuIDaCCpUwQSWUgVgdSSEXkDoIxLZQIZCmiYwNGxgMgYwTQMwKxJL1/v9fAhVfALL1oQrXAcWCQQyQMwKBmA0qsR+o8BeSwiVAhbEwGxlBHgQqmAJkZ6M5ezZQYRqyANjNQMEcINWFJD4ZXSHcZCSP9YOcBFSYjS2EAAIMAEVuM9o+OC6/AAAAAElFTkSuQmCC"/>';
-  $sourceAl = '<img src="data:image/png;base64,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" class="er"/>';
-  $sourceEr = '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAJPSURBVDjLpZPLS5RhFMYfv9QJlelTQZwRb2OKlKuINuHGLlBEBEOLxAu46oL0F0QQFdWizUCrWnjBaDHgThCMoiKkhUONTqmjmDp2GZ0UnWbmfc/ztrC+GbM2dXbv4ZzfeQ7vefKMMfifyP89IbevNNCYdkN2kawkCZKfSPZTOGTf6Y/m1uflKlC3LvsNTWArr9BT2LAf+W73dn5jHclIBFZyfYWU3or7T4K7AJmbl/yG7EtX1BQXNTVCYgtgbAEAYHlqYHlrsTEVQWr63RZFuqsfDAcdQPrGRR/JF5nKGm9xUxMyr0YBAEXXHgIANq/3ADQobD2J9fAkNiMTMSFb9z8ambMAQER3JC1XttkYGGZXoyZEGyTHRuBuPgBTUu7VSnUAgAUAWutOV2MjZGkehgYUA6O5A0AlkAyRnotiX3MLlFKduYCqAtuGXpyH0XQmOj+TIURt51OzURTYZdBKV2UBSsOIcRp/TVTT4ewK6idECAihtUKOArWcjq/B8tQ6UkUR31+OYXP4sTOdisivrkMyHodWejlXwcC38Fvs8dY5xaIId89VlJy7ACpCNCFCuOp8+BJ6A631gANQSg1mVmOxxGQYRW2nHMha4B5WA3chsv22T5/B13AIicWZmNZ6cMchTXUe81Okzz54pLi0uQWp+TmkZqMwxsBV74Or3od4OISPr0e3SHa3PX0f3HXKofNH/UIG9pZ5PeUth+CyS2EMkEqs4fPEOBJLsyske48/+xD8oxcAYPzs4QaS7RR2kbLTTOTQieczfzfTv8QPldGvTGoF6/8AAAAASUVORK5CYII=" class="alert"/>';
+  $sourceOk = '<svg class="tick-margin" width="14px" height="14px" fill="#000000" viewBox="0 0 14 14" role="img" focusable="false" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path fill="green" d="M13 4.1974q0 .3097-.21677.5265L7.17806 10.329l-1.0529 1.0529q-.21677.2168-.52645.2168-.30968 0-.52645-.2168L4.01935 10.329 1.21677 7.5264Q1 7.3097 1 7t.21677-.5265l1.05291-1.0529q.21677-.2167.52645-.2167.30968 0 .52645.2167l2.27613 2.2839 5.07871-5.0864q.21677-.2168.52645-.2168.30968 0 .52645.2168l1.05291 1.0529Q13 3.8877 13 4.1974z"></path></g></svg>';
+  $sourceAl = '<svg class="warning-margin" width="14px" height="14px" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--twemoji" preserveAspectRatio="xMidYMid meet" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path fill="#FFCC4D" d="M2.653 35C.811 35-.001 33.662.847 32.027L16.456 1.972c.849-1.635 2.238-1.635 3.087 0l15.609 30.056c.85 1.634.037 2.972-1.805 2.972H2.653z"></path><path fill="#231F20" d="M15.583 28.953a2.421 2.421 0 0 1 2.419-2.418a2.421 2.421 0 0 1 2.418 2.418a2.422 2.422 0 0 1-2.418 2.419a2.422 2.422 0 0 1-2.419-2.419zm.186-18.293c0-1.302.961-2.108 2.232-2.108c1.241 0 2.233.837 2.233 2.108v11.938c0 1.271-.992 2.108-2.233 2.108c-1.271 0-2.232-.807-2.232-2.108V10.66z"></path></g></svg>';
+  $sourceEr = '<svg class="error-margin" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 50 50" xml:space="preserve" width="14px" height="14px" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle style="fill:#D75A4A;" cx="25" cy="25" r="25"></circle> <polyline style="fill:none;stroke:#FFFFFF;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;" points="16,34 25,25 34,16 "></polyline> <polyline style="fill:none;stroke:#FFFFFF;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;" points="16,16 25,25 34,34 "></polyline> </g></svg>';
   $requireExtentions = array('zip', 'mysqli', 'gd', 'json', 'session', 'curl','ionCube Loader');
   $desireExtentions = array('xmlwriter', 'xmlreader');
   $systemMemoryLimit = 128;
@@ -494,11 +646,11 @@ function testserver(){
     // пытаемся найти apache
     if(substr_count(mb_strtolower($_SERVER['SERVER_SOFTWARE']), 'apache')) {
       // проверка модреврайта
-      if(isModRewrite() == 'true') {
+     /* if(isModRewrite() == 'true') {
         $modeRewrite = "<li>Поддержка работы модуля mod_rewrite ".$sourceOk."</li>";
       } else {
         $modeRewrite = "<li>Поддержка работы модуля mod_rewrite <span class='notify'>необходимо включить mod_rewrite</span></li>";
-      }
+      }*/
     }
     // пытаемся найти apache
     if(substr_count(mb_strtolower($_SERVER['SERVER_SOFTWARE']), 'nginx')) {
@@ -531,11 +683,11 @@ function testserver(){
       $desireList[$ext] = $sourceOk;
     }
   }  
-  if(version_compare(PHP_VERSION, '5.4.0', '<')){
-    $phpVersion = $sourceAl.'<span class="notify">Рекомендуем установить PHP не ниже версии 5.4. Текущая версия '.PHP_VERSION.'</span>';
+  if(version_compare(PHP_VERSION, '5.6.0', '<')){
+    $phpVersion = $sourceAl.'<span class="notify">Необходимо установить PHP не ниже версии 5.6. Текущая версия '.PHP_VERSION.'</span>';
     $err = true;
-  }else if(version_compare(PHP_VERSION, '7.3.99', '>')){
-    $phpVersion = $sourceAl.'<span class="notify">Рекомендуем установить PHP не выше версии 7.3. Текущая версия '.PHP_VERSION.'</span>';
+  }else if(version_compare(PHP_VERSION, '7.4.99', '>')){
+    $phpVersion = $sourceAl.'<span class="notify">Необходимо установить PHP не выше версии 7.4. Текущая версия '.PHP_VERSION.'</span>';
     $err = true;
   } else {
     $phpVersion = $sourceOk;
@@ -547,52 +699,49 @@ function testserver(){
   }
   
   echo '<form action="" method="post">';
-  $selectEdition = '<select name="edition">
-  <option value="MogutaSaasForPHP">Гипермаркет</option>
+  $selectEdition = '<select class="edition-select" name="edition" id="edition-select">
   <option value="MogutaGiperForPHP">Гипермаркет</option>
   <option value="MogutaMarketForPHP">Маркет</option>
   <option value="MogutaMiniMarketForPHP">Минимаркет</option>
-  <option value="MogutaVitrinaForPHP">Витрина</option>  
-  <option value="MogutaRentForPHP">Магазин в аренду</option>  
   </select>';      
   
   echo '<p>Cейчас будет произведена установка Вашего интернет-магазина.</p>
         <h3>Выберите желаемую редакцию Moguta.CMS:</h3>
-		<p>'.$selectEdition.' (<a href="http://moguta.ru/downloads" target="_blank">сравнение редакций</a>)</p>
-		<p>Вам необходимо иметь базу данных на Вашем хостинге и знать параметры для подключения к ней. 
-        Если в процессе установки у Вас возникнут вопросы, Вы можете найти ответы в <a href="http://wiki.moguta.ru/ustanovka-sistemy" target="_blank">документации</a> 
-        или на <a href="http://forum.moguta.ru" target="_blank">форуме Moguta.CMS</a></p>
+        <div class="sele-comparison">'.$selectEdition.'<span class="comparison">(<a href="https://moguta.ru/downloads" target="_blank">сравнение редакций</a>)</span></div>
+        <p>Вам необходимо иметь базу данных на Вашем хостинге и знать параметры для подключения к ней. 
+        Если в процессе установки у Вас возникнут вопросы, Вы можете найти ответы в <a href="https://wiki.moguta.ru/ustanovka-sistemy" target="_blank">документации</a> или заказать <a href="https://moguta.ru/uslugi/usluga-po-ustanovke" target="_blank">услугу по установке</a>. 
+        </p>
       ';
 
   echo "<h3>Минимальные системные требования:</h3>";
   echo "<ul class='feature-list'>";
-  echo "<li>Версия PHP не ниже 5.4 ".$phpVersion."</li>";
+  echo "<li>Версия PHP не ниже 5.6 ".$phpVersion."</li>";
   echo "<li>MySQL с поддержкой MySQLi ".$requireList['mysqli']."</li>";
   echo "<li>Поддержка работы с ZIP архивами ".$requireList['zip']."</li>";
   echo $modeRewrite;
   echo "<li>Поддержка работы с графическими изображениями ".$requireList['gd']."</li>";
   echo "<li>Поддержка работы с XML файлами ".$desireList['xml']."</li>";
-	echo "<li>Поддержка работы с данными в формате JSON ".$requireList['json']."</li>";
+    echo "<li>Поддержка работы с данными в формате JSON ".$requireList['json']."</li>";
  
   echo "<li>Открытые права на запись файлов ".$access."</li>";
   echo "<li>Поддержка получения обновлений ".$requireList['curl']."</li>";
   echo "<li>PHP модуль ionCube Loader ".$requireList['ionCube Loader']."</li>";
   echo "</ul>";
   echo '<p><strong>Перед началом установки необходимо ознакомиться с 
-  <a href="http://moguta.ru/license" target="_blank">"Лицензионным соглашением и условиями использования"</a>.</strong></p>';
-		
+  <a href="https://moguta.ru/license" target="_blank">Лицензионным соглашением и условиями использования</a>.</strong></p>';
+        
   if(!$err){
     echo $nginxWarning;
     echo $memoryLimitWarning;
     echo '<form action="" method="post">
           <div class="agree-blok"> 
-      <label id="accept_license">Я прочитал <a href="http://moguta.ru/license" target="_blank">"Условия использования"</a> и согласен с ними <input type="checkbox" name="agree" value="ok" id="agree" ></label>          
-		  <button class="start-install opacity" id="button_start_upload" type="submit" name="step" value="upload" disabled><span>Начать установку</span></button>
-          <div class="upload-process" id="ajaxloader" style="display:none;float:right;">Идет загрузка файлов системы<br /><img src="http://moguta.ru/downloads/ajax-loader.gif" style="margin-top:5px;float:right;" /></div>		
+      <label id="accept_license">Я прочитал <a href="https://moguta.ru/license" target="_blank">Условия использования</a> и согласен с ними <input type="checkbox" name="agree" value="ok" id="agree" ></label>          
+          <button class="start-install opacity" id="button_start_upload" type="submit" name="step" value="upload" disabled><span>Начать установку</span></button>
+          <div class="upload-process" id="ajaxloader" style="display:none;float:right;">Идет загрузка файлов системы<br /><img src="https://moguta.ru/downloads/ajax-loader.gif" style="margin-top:5px;float:right;" /></div>       
       </div>';
   }else{
     echo '<div class="error"><p>Дальнейшая установка невозможна!</p></div>';
-	  }
+      }
   }
   echo '</form>';
 function uploadFile(){
@@ -626,31 +775,30 @@ function extractZip($file) {
       $realDocumentRoot = str_replace(DIRECTORY_SEPARATOR.'mg-core'.DIRECTORY_SEPARATOR.'lib', '', dirname(__FILE__));
       $zip->extractTo($realDocumentRoot);
       $zip->close();
-      unlink($file);	
+    //   unlink($file);    
       $arrayEdition=array(
-      "MogutaSaasForPHP"=>"saas",
-	    "MogutaGiperForPHP"=>"giper",
-	    "MogutaMarketForPHP"=>"market",
-	    "MogutaMiniMarketForPHP"=>"lite",
-        "MogutaVitrinaForPHP"=>"vitrina",
-	    "MogutaRentForPHP"=>"rent" 
-	  );
-	  $edition = $arrayEdition[$_REQUEST['edition']];	  
-      checkLaunchingInstall("upload",$edition);
+      "MogutaGiperForPHP"=>"giper",
+        "MogutaMarketForPHP"=>"market",
+        "MogutaMiniMarketForPHP"=>"lite",
+        //"MogutaVitrinaForPHP"=>"vitrina",
+        //"MogutaRentForPHP"=>"rent" 
+      );
+      $edition = $arrayEdition[$_REQUEST['edition']];     
+    //   checkLaunchingInstall("upload",$edition);
       if(extension_loaded('Zend OPcache')){@opcache_reset();}
-      header("Location: index.php?step1=go&agree=ok&id=29805");
+      header("Location: index.php?step1=go&agree=ok&id=33674");
       exit();
     }else{
       echo '<div class="error"><p>В процессе распаковки произошла непредвиденная ошибка.<br />
-		Очистите корневую директорию сайта и попробуйте снова.</p></div>';
+        Очистите корневую директорию сайта и попробуйте снова.</p></div>';
     }
   }
 }
 // отправляет на сервер флаг запуска установщика 
 function checkLaunchingInstall($flag = null,$edition="") {
-$id = 29805;
+$id = 33674;
 if ($id&&$flag) {
-	$post = "&installer=".$id."&flag=".$flag;
+    $post = "&installer=".$id."&flag=".$flag;
     $url = "https://moguta.ru/checkinstaller";
      // Иницализация библиотеки curl.
     $ch = curl_init();
@@ -779,3 +927,57 @@ if ($id&&$flag) {
       @file_put_contents('.htaccess', $htaccess);
       @chmod('.htaccess', 0755);
   }  
+
+?>
+<script type="text/javascript">
+$('select').each(function(){
+    var $this = $(this), numberOfOptions = $(this).children('option').length;
+  
+    $this.addClass('select-hidden'); 
+    $this.wrap('<div class="select"></div>');
+    $this.after('<div class="select-styled"></div>');
+
+    var $styledSelect = $this.next('div.select-styled');
+    $styledSelect.text($this.children('option').eq(0).text());
+  
+    var $list = $('<ul />', {
+        'class': 'select-options'
+    }).insertAfter($styledSelect);
+  
+    for (var i = 0; i < numberOfOptions; i++) {
+        $('<li />', {
+            text: $this.children('option').eq(i).text(),
+            rel: $this.children('option').eq(i).val()
+        }).appendTo($list);
+        if ($this.children('option').eq(i).is(':selected')){
+          $('li[rel="' + $this.children('option').eq(i).val() + '"]').addClass('is-selected')
+        }
+    }
+  
+    var $listItems = $list.children('li');
+  
+    $styledSelect.click(function(e) {
+        e.stopPropagation();
+        $('div.select-styled.active').not(this).each(function(){
+            $(this).removeClass('active').next('ul.select-options').hide();
+        });
+        $(this).toggleClass('active').next('ul.select-options').toggle();
+    });
+  
+    $listItems.click(function(e) {
+        e.stopPropagation();
+        $styledSelect.text($(this).text()).removeClass('active');
+        $this.val($(this).attr('rel'));
+      $list.find('li.is-selected').removeClass('is-selected');
+      $list.find('li[rel="' + $(this).attr('rel') + '"]').addClass('is-selected');
+        $list.hide();
+        //console.log($this.val());
+    });
+  
+    $(document).click(function() {
+        $styledSelect.removeClass('active');
+        $list.hide();
+    });
+
+});
+</script>
