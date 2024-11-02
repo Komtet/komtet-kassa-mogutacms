@@ -14,7 +14,7 @@ sudo chmod -R 777 php
 ```
 * Добавить запись в /etc/hosts
 ```sh
-127.0.0.1       moguta-kassa.komtet.ru
+127.0.0.1       moguta-kassa.localhost.com
 ```
 * Добавить nginx конфиги
 ```sh
@@ -29,7 +29,7 @@ ____
 ```shell
 make start
 ```
-* Проект будет доступен по адресу: `http://moguta-kassa.komtet.ru/`
+* Проект будет доступен по адресу: `http://moguta-kassa.localhost.com/`
 * Настройки подключения к бд MySQL:
 ```shell
 Сервер: mysql

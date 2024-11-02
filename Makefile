@@ -24,7 +24,7 @@ stop: ## Остановить все контейнеры
 	@docker-compose down
 
 start: stop  ## Запустить контейнер
-	@docker-compose up -d web
+	@docker-compose up
 
 release: ## Создать архив для загрузки в маркет
 	@mkdir -p $(DIST_MARKET_DIR)

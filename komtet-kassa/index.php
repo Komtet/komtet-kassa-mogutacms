@@ -3,7 +3,7 @@
 	Plugin Name: Онлайн касса КОМТЕТ Касса
 	Description: Плагин для отправки электронных чеков и фискализации по 54-ФЗ
 	Author: КОМТЕТ Касса
-	Version: 1.2.0
+	Version: 1.3.0
 */
 
 require PLUGIN_DIR.'komtet-kassa/lib/komtet-kassa-php-sdk/autoload.php';
@@ -71,6 +71,7 @@ class KomtetKassa{
         mgAddAction(__FILE__, array(__CLASS__, 'pageSettingsPlugin'));  // Настройки плагина
         mgAddAction('Models_Order_updateOrder', array(__CLASS__, 'updateOrder'),1);  // Подписка на хук(обновление заказа)
         mgAddAction('Models_Order_addOrder', array(__CLASS__, 'createOrder'),1);  // Подписка на хук(созадние заказа)
+        mgAddAction('Controllers_Payment_actionWhenPayment', array(__CLASS__, 'payOrder'),1);  // Подписка на хук(оплата заказа)
     }
 
     /**
@@ -177,6 +178,39 @@ class KomtetKassa{
         }
 
         include 'pageplugin.php';
+    }
+
+    static function payOrder($args){
+
+        /**
+        * Обработчик события оплаты заказа, приходящее от плагина платежной системы
+        */
+
+        $eventOrder = $args['args'];
+
+        if (!isset($eventOrder['paymentOrderId'])) {
+            return;
+        }
+        $orderId = $eventOrder['paymentOrderId'];
+
+        if (!isset($eventOrder['paymentID'])) {
+            return;
+        }
+
+        $paymentId = $eventOrder['paymentID'];
+
+        $orderModel = new Models_Order();
+        $orders = $orderModel->getOrder('`id` = '.DB::quoteInt($orderId));
+
+        if (!isset($orders[$orderId])) {
+            return;
+        }
+
+        $mogutaOrder = $orders[$orderId];
+
+        self::updateOrder([
+            'args' => [$mogutaOrder]
+        ]);
     }
 
     static function createOrder($args){
@@ -445,13 +479,12 @@ class KomtetKassa{
 
         try {
             return $manager->putCheck($check, 'ss-queue');
-        } catch (Exception $e) {
+        } catch (ApiValidationException $e) {
             MG::loger(
                 "Ошибка фискализации заказа.
                  [Ответ - ".$e->getMessage().". ".$e->getDescription()."]
                  [Код КК - ".$e->getVLDCode()."]"
             );
-
             DB::query(
                 "UPDATE `".PREFIX."kk_order`
                  SET `request` = " .DB::quote(serialize($check->asArray()))."
@@ -462,7 +495,30 @@ class KomtetKassa{
                  SET `response` = " .DB::quote($e->getMessage().". ".$e->getDescription()) ."
                  WHERE `order_id` = " .DB::quoteInt($check->asArray()['external_id'])
             );
-
+            return false;
+        }
+        catch (SdkException $e) {
+            MG::loger(
+                "Ошибка фискализации заказа.
+                 [Сообщение - ".$e->getMessage()."]"
+            );
+            DB::query(
+                "UPDATE `".PREFIX."kk_order`
+                 SET `request` = " .DB::quote(serialize($check->asArray()))."
+                 WHERE `order_id` = " .DB::quoteInt($check->asArray()['external_id'])
+            );
+            DB::query(
+                "UPDATE `".PREFIX."kk_order`
+                 SET `response` = " .DB::quote($e->getMessage()) ."
+                 WHERE `order_id` = " .DB::quoteInt($check->asArray()['external_id'])
+            );
+            return false;
+        }
+        catch (Exception $e) {
+            MG::loger(
+                "Ошибка при попытке фискализации заказа.
+                 [Сообщение - ".$e->getMessage()."]"
+            );
             return false;
         }
     }
