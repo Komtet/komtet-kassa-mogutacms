@@ -3,7 +3,8 @@
 	Plugin Name: Онлайн касса КОМТЕТ Касса
 	Description: Плагин для отправки электронных чеков и фискализации по 54-ФЗ
 	Author: КОМТЕТ Касса
-	Version: 1.3.0
+	Version: 1.4.0
+    Edition: CLOUD
 */
 
 require PLUGIN_DIR.'komtet-kassa/lib/komtet-kassa-php-sdk/autoload.php';
@@ -65,7 +66,23 @@ class KomtetKassa{
     public function __construct() {
 
         self::$pluginName = PM::getFolderPlugin(__FILE__);
-        self::$path = PLUGIN_DIR.self::$pluginName;
+
+        $explode = explode(str_replace('/', DS, PLUGIN_DIR), dirname(__FILE__));
+        if (strpos($explode[0], 'mg-templates') === false) {
+            self::$path = str_replace('\\', '/', PLUGIN_DIR.DS.$explode[1]);
+        } else {
+            $templatePath = str_replace('\\', '/', $explode[0]);
+            $templatePathParts = explode('/', $templatePath);
+            $templatePathParts = array_filter($templatePathParts, function($pathPart) {
+                if (trim($pathPart)) {
+                return true;
+                }
+                return false;
+            });
+            $templateName = end($templatePathParts);
+            self::$path = 'mg-templates/'.$templateName.'/mg-plugins/'.$explode[1];
+        }
+
 
         mgActivateThisPlugin(__FILE__, array(__CLASS__, 'activate'));  // Активация плагина
         mgAddAction(__FILE__, array(__CLASS__, 'pageSettingsPlugin'));  // Настройки плагина
@@ -189,12 +206,26 @@ class KomtetKassa{
         $eventOrder = $args['args'];
 
         if (!isset($eventOrder['paymentOrderId'])) {
-            return;
+            array_push(
+                $args['result'],
+                [
+                    'status' => 'fail',
+                    'message' => 'KomtetKassa: не был получен параметр paymentOrderId',
+                ]
+            );
+            return $args['result'];
         }
         $orderId = $eventOrder['paymentOrderId'];
 
         if (!isset($eventOrder['paymentID'])) {
-            return;
+            array_push(
+                $args['result'],
+                [
+                    'status' => 'fail',
+                    'message' => 'KomtetKassa: не был получен параметр paymentID',
+                ]
+            );
+            return $args['result'];
         }
 
         $paymentId = $eventOrder['paymentID'];
@@ -203,7 +234,14 @@ class KomtetKassa{
         $orders = $orderModel->getOrder('`id` = '.DB::quoteInt($orderId));
 
         if (!isset($orders[$orderId])) {
-            return;
+            array_push(
+                $args['result'],
+                [
+                    'status' => 'fail',
+                    'message' => "KomtetKassa: заказ с идентификатором {$orderId} отсутствует",
+                ]
+            );
+            return $args['result'];
         }
 
         $mogutaOrder = $orders[$orderId];
@@ -225,7 +263,14 @@ class KomtetKassa{
 
         $pluginSettings = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
         if ($mogutaOrder['status_id'] != self::ORDER_STATUS_MAP['paid']) {
-            return false;
+            array_push(
+                $args['result'],
+                [
+                    'status' => 'success',
+                    'message' => "KomtetKassa: Не требуется фискализация еще не оплаченного заказа {$orderNumber}",
+                ]
+            );
+            return $args['result'];
         }
 
         $paymentOptions  = unserialize(stripslashes(MG::getSetting('komtet-kassa-payment-option')));
@@ -247,12 +292,26 @@ class KomtetKassa{
             try {
                 $check = self::buildCheck($orderNumber, $mogutaOrder, $paymentType, $checkType);
             } catch (Exception $e) {
-                MG::loger("Ошибка при сборке чека по заказу № - ". $orderNumber. ', id - ' . $orderId);
-                return false;
+                MG::loger("Ошибка при сборке чека по заказу №{$orderNumber}, id: {$orderId}");
+                array_push(
+                    $args['result'],
+                    [
+                        'status' => 'fail',
+                        'message' => "KomtetKassa: Ошибка при сборке чека по заказу №{$orderNumber}, id: {$orderId}",
+                    ]
+                );
+                return $args['result'];
             }
 
             if (!self::fiscalizeOrder($pluginSettings, $check)) {
-                return false;
+                array_push(
+                    $args['result'],
+                    [
+                        'status' => 'fail',
+                        'message' => "KomtetKassa: Ошибка при попытке фискализации чека по заказу №{$orderNumber}, id: {$orderId}",
+                    ]
+                );
+                return $args['result'];
             }
 
             DB::query("
@@ -267,7 +326,7 @@ class KomtetKassa{
 
         }
 
-        return true;
+        return $args['result'];
     }
 
     static function updateOrder($args) {
@@ -297,12 +356,61 @@ class KomtetKassa{
         $closedOrder = ($mogutaOrder['status_id'] == $pluginSettings['fullpayment_check_status'] and
                         $order['fulfillment_status_id'] == $pluginSettings['fullpayment_check_status']);
 
-        if ($unhandledOrder or $paidOrder or $returnedOrder or $closedOrder) {
-            return false;
+        $returnPaidOrder = $mogutaOrder['status_id'] == self::ORDER_STATUS_MAP['returned'] && !$order['check_type'];
+
+        if ($unhandledOrder) {
+            array_push(
+                $args['result'],
+                [
+                    'status' => 'success',
+                    'message' => "KomtetKassa: Не требуется фискализация еще не оплаченного заказа {$orderNumber}",
+                ]
+            );
+            return $args['result'];
         }
 
-        if ($mogutaOrder['status_id'] == self::ORDER_STATUS_MAP['returned'] && !$order['check_type']) {
-            return false;
+        if ($paidOrder) {
+            array_push(
+                $args['result'],
+                [
+                    'status' => 'success',
+                    'message' => "KomtetKassa: Не требуется повторная фискализация при не возврате или не закрытии чека заказа {$orderNumber}",
+                ]
+            );
+            return $args['result'];
+        }
+
+        if ($returnedOrder) {
+            array_push(
+                $args['result'],
+                [
+                    'status' => 'success',
+                    'message' => "KomtetKassa: Не требуется фискализация заказа {$orderNumber}, по которому был выдан чек возврата",
+                ]
+            );
+            return $args['result'];
+        }
+
+        if ($closedOrder) {
+            array_push(
+                $args['result'],
+                [
+                    'status' => 'success',
+                    'message' => "KomtetKassa: Не требуется повторная фискализация уже фискалазированного заказа {$orderNumber}",
+                ]
+            );
+            return $args['result'];
+        }
+
+        if ($returnPaidOrder) {
+            array_push(
+                $args['result'],
+                [
+                    'status' => 'success',
+                    'message' => "KomtetKassa: Не требуется выдача чека возврата на не обработанный заказ {$orderNumber}",
+                ]
+            );
+            return $args['result'];
         }
 
         foreach($pluginSettings['payments'] as $payment) {
@@ -338,13 +446,28 @@ class KomtetKassa{
                     $isReturn
                 );
             } catch (Exception $e) {
-                MG::loger("Ошибка при сборке чека " . ($isReturn ? "Возврата" : "") . " по заказу№ - ". $orderNumber. ', id - ' . $orderId);
-                return false;
+                MG::loger("Ошибка при сборке чека" . ($isReturn ? " возврата " : " ") . "по заказу №". $orderNumber. ', id: ' . $orderId);
+                array_push(
+                    $args['result'],
+                    [
+                        'status' => 'fail',
+                        'message' => "KomtetKassa: Ошибка при сборке чека" . ($isReturn ? " возврата " : " ") . "по заказу №". $orderNumber. ', id: ' . $orderId,
+                    ]
+                );
+                return $args['result'];
             }
 
             if ($check) {
                 if (!self::fiscalizeOrder($pluginSettings, $check)) {
-                    return false;
+                    MG::loger("Ошибка при попытке фискализации чека" . ($isReturn ? " возврата " : " ") . "по заказу №". $orderNumber. ', id: ' . $orderId);
+                    array_push(
+                        $args['result'],
+                        [
+                            'status' => 'fail',
+                            'message' => "KomtetKassa: Ошибка при попытке фискализации чека" . ($isReturn ? " возврата " : " ") . "по заказу №". $orderNumber. ', id: ' . $orderId,
+                        ]
+                    );
+                    return $args['result'];
                 }
 
                 DB::query(
@@ -379,7 +502,7 @@ class KomtetKassa{
             }
         }
 
-        return true;
+        return $args['result'];
     }
 
     /**
