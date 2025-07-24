@@ -58,8 +58,12 @@
 	      <select name="vat">
             <option value="no" <?php echo ($options['vat'] == 'no' ? 'selected' : ''); ?>>Без НДС</option>
             <option value="0" <?php echo ($options['vat'] == '0' ? 'selected' : ''); ?>>0%</option>
+            <option value="5" <?php echo ($options['vat'] == '5' ? 'selected' : ''); ?>>5%</option>
+            <option value="7" <?php echo ($options['vat'] == '7' ? 'selected' : ''); ?>>7%</option>
             <option value="10" <?php echo ($options['vat'] == '10' ? 'selected' : ''); ?>>10%</option>
             <option value="20" <?php echo ($options['vat'] == '20' ? 'selected' : ''); ?>>20%</option>
+            <option value="105" <?php echo ($options['vat'] == '105' ? 'selected' : ''); ?>>5/105</option>
+            <option value="107" <?php echo ($options['vat'] == '107' ? 'selected' : ''); ?>>7/107</option>
             <option value="110" <?php echo ($options['vat'] == '110' ? 'selected' : ''); ?>>10/110</option>
             <option value="120" <?php echo ($options['vat'] == '120' ? 'selected' : ''); ?>>20/120</option>
 	      </select>
@@ -75,8 +79,12 @@
 	      <select name="vat_delivery">
             <option value="no" <?php echo ($options['vat_delivery'] == 'no' ? 'selected' : ''); ?>>Без НДС</option>
             <option value="0" <?php echo ($options['vat_delivery'] == '0' ? 'selected' : ''); ?>>0%</option>
+            <option value="5" <?php echo ($options['vat_delivery'] == '5' ? 'selected' : ''); ?>>5%</option>
+            <option value="7" <?php echo ($options['vat_delivery'] == '7' ? 'selected' : ''); ?>>7%</option>
             <option value="10" <?php echo ($options['vat_delivery'] == '10' ? 'selected' : ''); ?>>10%</option>
             <option value="20" <?php echo ($options['vat_delivery'] == '20' ? 'selected' : ''); ?>>20%</option>
+            <option value="105" <?php echo ($options['vat_delivery'] == '105' ? 'selected' : ''); ?>>5/105</option>
+            <option value="107" <?php echo ($options['vat_delivery'] == '107' ? 'selected' : ''); ?>>7/107</option>
             <option value="110" <?php echo ($options['vat_delivery'] == '110' ? 'selected' : ''); ?>>10/110</option>
             <option value="120" <?php echo ($options['vat_delivery'] == '120' ? 'selected' : ''); ?>>20/120</option>
 	      </select>

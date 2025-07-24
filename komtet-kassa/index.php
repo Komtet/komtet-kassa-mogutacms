@@ -9,14 +9,14 @@
 
 require PLUGIN_DIR.'komtet-kassa/lib/komtet-kassa-php-sdk/autoload.php';
 
-use Komtet\KassaSdk\CalculationMethod;
-use Komtet\KassaSdk\CalculationSubject;
-use Komtet\KassaSdk\Client;
-use Komtet\KassaSdk\QueueManager;
-use Komtet\KassaSdk\Check;
-use Komtet\KassaSdk\Payment;
-use Komtet\KassaSdk\Position;
-use Komtet\KassaSdk\Vat;
+use Komtet\KassaSdk\v1\CalculationMethod;
+use Komtet\KassaSdk\v1\CalculationSubject;
+use Komtet\KassaSdk\v1\Client;
+use Komtet\KassaSdk\v1\QueueManager;
+use Komtet\KassaSdk\v1\Check;
+use Komtet\KassaSdk\v1\Payment;
+use Komtet\KassaSdk\v1\Position;
+use Komtet\KassaSdk\v1\Vat;
 use Komtet\KassaSdk\Exception\SdkException;
 
 new KomtetKassa;
