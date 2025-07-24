@@ -506,6 +506,21 @@ class KomtetKassa{
     }
 
     /**
+     * В чеках предоплаты для ставок НДС 5%, 7%, 10% и 20% необходимо использовать
+     * расчетную ставку 5/105, 7/107, 10/110 и 20/120. Письмо ФНС России от 03.07.2018 N ЕД-4-20/12717
+     */
+    private static function getVatRateForPrepayment($vatRate) {
+        $prepaymentRates = [
+            '5'  => '5/105',
+            '7'  => '7/107',
+            '10' => '10/110',
+            '20' => '20/120',
+        ];
+
+        return $prepaymentRates[(string)$vatRate] ?? $vatRate;
+    }
+
+    /**
      * Формирование чека
      *
      * Параметры:
@@ -534,14 +549,24 @@ class KomtetKassa{
             $mogutaOrder['order_content'] = $unserializePositions;
         }
 
+        $vatRate = $pluginSettings['vat'];
+        if ($checkType === CalculationMethod::PRE_PAYMENT_FULL) {
+            $vatRate = self::getVatRateForPrepayment($vatRate);
+        }
+
         foreach ($mogutaOrder['order_content'] as $orderItem) {
-            $vat = new Vat($pluginSettings['vat']);
+            $vat = new Vat($vatRate);
             $position = self::generatePosition($orderItem, $orderItem['count'], $vat, $checkType);
             $check->addPosition($position);
         }
 
         if ((float)$mogutaOrder['delivery_cost'] > 0) {
-            $vatDelivery = new Vat($pluginSettings['vat_delivery']);
+            $vatDeliveryRate = $pluginSettings['vat_delivery'];
+            if ($checkType === CalculationMethod::PRE_PAYMENT_FULL) {
+                $vatDeliveryRate = self::getVatRateForPrepayment($vatDeliveryRate);
+            }
+
+            $vatDelivery = new Vat($vatDeliveryRate);
             $queryOrder = DB::query(
                 "SELECT *
                  FROM `".PREFIX."delivery`
