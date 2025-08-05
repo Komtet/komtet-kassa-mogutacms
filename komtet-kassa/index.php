@@ -3,7 +3,7 @@
 	Plugin Name: Онлайн касса КОМТЕТ Касса
 	Description: Плагин для отправки электронных чеков и фискализации по 54-ФЗ
 	Author: КОМТЕТ Касса
-	Version: 1.4.0
+	Version: 1.5.0
     Edition: CLOUD
 */
 
