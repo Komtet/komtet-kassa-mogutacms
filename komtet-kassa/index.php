@@ -9,14 +9,14 @@
 
 require PLUGIN_DIR.'komtet-kassa/lib/komtet-kassa-php-sdk/autoload.php';
 
-use Komtet\KassaSdk\CalculationMethod;
-use Komtet\KassaSdk\CalculationSubject;
-use Komtet\KassaSdk\Client;
-use Komtet\KassaSdk\QueueManager;
-use Komtet\KassaSdk\Check;
-use Komtet\KassaSdk\Payment;
-use Komtet\KassaSdk\Position;
-use Komtet\KassaSdk\Vat;
+use Komtet\KassaSdk\v1\CalculationMethod;
+use Komtet\KassaSdk\v1\CalculationSubject;
+use Komtet\KassaSdk\v1\Client;
+use Komtet\KassaSdk\v1\QueueManager;
+use Komtet\KassaSdk\v1\Check;
+use Komtet\KassaSdk\v1\Payment;
+use Komtet\KassaSdk\v1\Position;
+use Komtet\KassaSdk\v1\Vat;
 use Komtet\KassaSdk\Exception\SdkException;
 
 new KomtetKassa;
@@ -506,6 +506,23 @@ class KomtetKassa{
     }
 
     /**
+     * В чеках предоплаты для ставок НДС 5%, 7%, 10% и 20% необходимо использовать
+     * расчетную ставку 5/105, 7/107, 10/110 и 20/120. Письмо ФНС России от 03.07.2018 N ЕД-4-20/12717
+     */
+    private static function getVatRate($vatRate, $checkType) {
+        if ($checkType === CalculationMethod::PRE_PAYMENT_FULL) {
+            $prepaymentRates = [
+                '5'  => '5/105',
+                '7'  => '7/107',
+                '10' => '10/110',
+                '20' => '20/120',
+            ];
+            return $prepaymentRates[(string)$vatRate] ?? $vatRate;
+        }
+        return $vatRate;
+    }
+
+    /**
      * Формирование чека
      *
      * Параметры:
@@ -534,14 +551,18 @@ class KomtetKassa{
             $mogutaOrder['order_content'] = $unserializePositions;
         }
 
+        $vatRate = self::getVatRate($pluginSettings['vat'], $checkType);
+
         foreach ($mogutaOrder['order_content'] as $orderItem) {
-            $vat = new Vat($pluginSettings['vat']);
+            $vat = new Vat($vatRate);
             $position = self::generatePosition($orderItem, $orderItem['count'], $vat, $checkType);
             $check->addPosition($position);
         }
 
         if ((float)$mogutaOrder['delivery_cost'] > 0) {
-            $vatDelivery = new Vat($pluginSettings['vat_delivery']);
+            $vatDeliveryRate = self::getVatRate($pluginSettings['vat_delivery'], $checkType);
+
+            $vatDelivery = new Vat($vatDeliveryRate);
             $queryOrder = DB::query(
                 "SELECT *
                  FROM `".PREFIX."delivery`
