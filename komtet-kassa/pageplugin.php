@@ -94,6 +94,17 @@
 		</div>
 	  </div>
 
+    <div class="row checkbox-field-margin">
+	    <div class="large-6 columns dashed">
+	      <span>Признак расчета в сети «Интернет»:</span>
+		</div>
+
+		<div class="large-6 columns margin">
+		  <input class="checkbox-margin" type="checkbox" name="is_internet" id="isInternet" <?php echo ($options['is_internet']=='true'?'checked':'') ?>>
+		  <label for="is_internet"></label>
+		</div>
+	  </div>
+
 	  <div class="row">
 	    <div class="large-6 columns dashed">
 		  <span>Чек предоплаты:</span>

@@ -30,6 +30,7 @@ var komtetKassaModule = (function() {
               vat : $('.base-settings-open select[name=vat]').val(),
               vat_delivery : $('.base-settings-open select[name=vat_delivery]').val(),
               is_print : $('.base-settings-open input[name=is_print]').prop('checked'),
+              is_internet : $('.base-settings-open input[name=is_internet]').prop('checked'),
               payments: komtetKassaModule.listOfPayments,
 
               prepayment_check_status : prepaymentStatus,

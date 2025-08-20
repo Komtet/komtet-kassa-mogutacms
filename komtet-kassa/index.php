@@ -523,6 +523,19 @@ class KomtetKassa{
     }
 
     /**
+     * Удаляем из телефона все, кроме цифр и символа '+' в начале номера, если он есть.
+     * Для телефона, который начинается на 7 без '+', добавляем '+' в начало.
+     */
+    private static function formatPhoneNumber($phoneNumber) {
+        $phoneNumber = preg_replace('/[^0-9+]/', '', $phoneNumber);
+        if (substr($phoneNumber, 0, 1) == "7") {
+            $phoneNumber = "+" . $phoneNumber;
+        }
+
+        return $phoneNumber;
+    }
+
+    /**
      * Формирование чека
      *
      * Параметры:
@@ -534,7 +547,9 @@ class KomtetKassa{
      *
      */
     static function buildCheck($orderNumber, $mogutaOrder, $paymentType, $checkType, $isReturning=false) {
-        $user = ($mogutaOrder['contact_email']) ? $mogutaOrder['contact_email'] : $mogutaOrder['phone'];
+        $user = ($mogutaOrder['contact_email'])
+            ? $mogutaOrder['contact_email']
+            : self::formatPhoneNumber($mogutaOrder['phone']);
         $pluginSettings = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
 
         if (!$isReturning) {
@@ -545,6 +560,11 @@ class KomtetKassa{
 
         $print_check = ($pluginSettings['is_print'] === 'true');
         $check->setShouldPrint($print_check); // печать чека на ккт
+
+        // Признак расчета в сети «Интернет»
+        if ($pluginSettings['is_internet'] === 'true') {
+            $check->setInternet(true);
+        }
 
         $unserializePositions = unserialize(stripslashes($mogutaOrder['order_content']));
         if ($unserializePositions) {
