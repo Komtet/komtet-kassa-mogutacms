@@ -26,6 +26,10 @@ stop: ## Остановить все контейнеры
 start: stop  ## Запустить контейнер
 	@docker-compose up
 
+update:  ## Установить/Обновить модуль
+	@rm -rf php/mg-plugins/komtet-kassa/* &&\
+	cp -r komtet-kassa/. php/mg-plugins/komtet-kassa/
+
 release: ## Создать архив для загрузки в маркет
 	@mkdir -p $(DIST_MARKET_DIR)
 	@zip -r -q $(DIST_MARKET_DIR)/$(PROJECT_ZIP) $(PROJECT_DIR)

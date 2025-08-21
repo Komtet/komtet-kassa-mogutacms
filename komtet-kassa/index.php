@@ -169,14 +169,35 @@ class KomtetKassa{
         self::preparePageSettings();
 
         $options = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
-        $savedPayments  = unserialize(stripslashes(MG::getSetting('komtet-kassa-payment-option')));
+        $savedPayments = unserialize(stripslashes(MG::getSetting('komtet-kassa-payment-option')));
 
-        $rows = DB::query("SELECT `id`, `name` FROM `".PREFIX."payment` WHERE `activity` = TRUE ORDER BY `sort` asc");
+        $rows = DB::query("
+            SELECT `id`, `name`
+            FROM `".PREFIX."payment`
+            WHERE `activity` = TRUE
+            ORDER BY `sort` ASC
+        ");
+
+        $isNewPayments = MG::isNewPayment();
+        $allowedIds = [];
+
+        // Если включена новая система оплат, то отображаем только новые способы оплат
+        if ($isNewPayments) {
+            $newPayments = Models_Payment::getPayments();
+            $allowedIds = array_map(fn($p) => (int)$p['id'], $newPayments);
+        }
+
         while ($row = DB::fetchAssoc($rows)) {
-            $paymentVariants[$row['id']] = [
-                'id' => $row['id'],
+            $id = (int)$row['id'];
+
+            if ($isNewPayments && !in_array($id, $allowedIds, true)) {
+                continue;
+            }
+
+            $paymentVariants[$id] = [
+                'id' => $id,
                 'name' => $row['name'],
-                'hash' => md5($row['name'].$row['id'])
+                'hash' => md5($row['name'].$id),
             ];
         }
 
