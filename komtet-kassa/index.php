@@ -169,14 +169,35 @@ class KomtetKassa{
         self::preparePageSettings();
 
         $options = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
-        $savedPayments  = unserialize(stripslashes(MG::getSetting('komtet-kassa-payment-option')));
+        $savedPayments = unserialize(stripslashes(MG::getSetting('komtet-kassa-payment-option')));
 
-        $rows = DB::query("SELECT `id`, `name` FROM `".PREFIX."payment` WHERE `activity` = TRUE ORDER BY `sort` asc");
+        $rows = DB::query("
+            SELECT `id`, `name`
+            FROM `".PREFIX."payment`
+            WHERE `activity` = TRUE
+            ORDER BY `sort` ASC
+        ");
+
+        $isNewPayments = MG::isNewPayment();
+        $allowedIds = [];
+
+        // Если включена новая система оплат, то отображаем только новые способы оплат
+        if ($isNewPayments) {
+            $newPayments = Models_Payment::getPayments();
+            $allowedIds = array_map(fn($p) => (int)$p['id'], $newPayments);
+        }
+
         while ($row = DB::fetchAssoc($rows)) {
-            $paymentVariants[$row['id']] = [
-                'id' => $row['id'],
+            $id = (int)$row['id'];
+
+            if ($isNewPayments && !in_array($id, $allowedIds, true)) {
+                continue;
+            }
+
+            $paymentVariants[$id] = [
+                'id' => $id,
                 'name' => $row['name'],
-                'hash' => md5($row['name'].$row['id'])
+                'hash' => md5($row['name'].$id),
             ];
         }
 
@@ -523,6 +544,19 @@ class KomtetKassa{
     }
 
     /**
+     * Удаляем из телефона все, кроме цифр и символа '+' в начале номера, если он есть.
+     * Для телефона, который начинается на 7 без '+', добавляем '+' в начало.
+     */
+    private static function formatPhoneNumber($phoneNumber) {
+        $phoneNumber = preg_replace('/[^0-9+]/', '', $phoneNumber);
+        if (substr($phoneNumber, 0, 1) == "7") {
+            $phoneNumber = "+" . $phoneNumber;
+        }
+
+        return $phoneNumber;
+    }
+
+    /**
      * Формирование чека
      *
      * Параметры:
@@ -534,7 +568,9 @@ class KomtetKassa{
      *
      */
     static function buildCheck($orderNumber, $mogutaOrder, $paymentType, $checkType, $isReturning=false) {
-        $user = ($mogutaOrder['contact_email']) ? $mogutaOrder['contact_email'] : $mogutaOrder['phone'];
+        $user = ($mogutaOrder['contact_email'])
+            ? $mogutaOrder['contact_email']
+            : self::formatPhoneNumber($mogutaOrder['phone']);
         $pluginSettings = unserialize(stripslashes(MG::getSetting('komtet-kassa-option')));
 
         if (!$isReturning) {
@@ -545,6 +581,11 @@ class KomtetKassa{
 
         $print_check = ($pluginSettings['is_print'] === 'true');
         $check->setShouldPrint($print_check); // печать чека на ккт
+
+        // Признак расчета в сети «Интернет»
+        if ($pluginSettings['is_internet'] === 'true') {
+            $check->setInternet(true);
+        }
 
         $unserializePositions = unserialize(stripslashes($mogutaOrder['order_content']));
         if ($unserializePositions) {
