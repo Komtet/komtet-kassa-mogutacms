@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  db:
+  moguta_db:
     image: mysql:5.7
     platform: linux/amd64
     environment:
@@ -13,19 +13,28 @@ services:
       - ./data/mysql:/var/lib/mysql
     ports:
       - "9906:3306"
-  web:
+  moguta_web:
     image: moguta_web:last
     platform: linux/amd64
     build: ./
     container_name: php_web
     depends_on:
-      - db
+      - moguta_db
     volumes:
       - ./php/:/var/www/html/
       - ./komtet-kassa/:/var/www/html/mg-plugins/komtet-kassa/
     ports:
       - "8100:80"
     links:
-      - db:mysql
+      - moguta_db:mysql
     stdin_open: true
     tty: true
+
+  moguta_phpmyadmin:
+    image: phpmyadmin
+    platform: linux/amd64
+    restart: always
+    ports:
+      - 8101:80
+    environment:
+      - PMA_ARBITRARY=1
