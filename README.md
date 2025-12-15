@@ -38,7 +38,7 @@ make start
 БД: test_db
 ```
 
-* Парель администратора будет доступна по адресу `moguta-kassa.localhost.com/mg-admin`
+* Панель администратора будет доступна по адресу `moguta-kassa.localhost.com/mg-admin`
 
 ____
 ## Доступные команды из Makefile
