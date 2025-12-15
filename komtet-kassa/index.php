@@ -537,6 +537,7 @@ class KomtetKassa{
                 '7'  => '7/107',
                 '10' => '10/110',
                 '20' => '20/120',
+                '22' => '22/122',
             ];
             return $prepaymentRates[(string)$vatRate] ?? $vatRate;
         }

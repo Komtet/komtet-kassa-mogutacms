@@ -62,6 +62,7 @@
             <option value="7" <?php echo ($options['vat'] == '7' ? 'selected' : ''); ?>>7%</option>
             <option value="10" <?php echo ($options['vat'] == '10' ? 'selected' : ''); ?>>10%</option>
             <option value="20" <?php echo ($options['vat'] == '20' ? 'selected' : ''); ?>>20%</option>
+            <option value="22" <?php echo ($options['vat'] == '22' ? 'selected' : ''); ?>>22%</option>
 	      </select>
 	    </div>
 	  </div>
@@ -79,6 +80,7 @@
             <option value="7" <?php echo ($options['vat_delivery'] == '7' ? 'selected' : ''); ?>>7%</option>
             <option value="10" <?php echo ($options['vat_delivery'] == '10' ? 'selected' : ''); ?>>10%</option>
             <option value="20" <?php echo ($options['vat_delivery'] == '20' ? 'selected' : ''); ?>>20%</option>
+            <option value="22" <?php echo ($options['vat_delivery'] == '22' ? 'selected' : ''); ?>>22%</option>
 	      </select>
 	    </div>
 	  </div>

@@ -1,5 +1,5 @@
 #FROM php:5.6.38-apache
-FROM php:7.4-apache
+FROM php:8.2-apache
 
 RUN a2enmod rewrite
 
@@ -15,5 +15,5 @@ WORKDIR /var/tmp
 
 RUN curl -fsSL 'http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz' -o ioncube.tar.gz \
     && tar -xvvzf ioncube.tar.gz \
-    && cp ioncube/ioncube_loader_lin_7.4* /usr/local/lib/php/extensions/no-debug-non-zts-20190902 \
-    && docker-php-ext-enable ioncube_loader_lin_7.4
+    && cp ioncube/ioncube_loader_lin_8.2* /usr/local/lib/php/extensions/no-debug-non-zts-20220829 \
+    && docker-php-ext-enable ioncube_loader_lin_8.2

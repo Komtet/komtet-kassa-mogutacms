@@ -6,7 +6,7 @@
 * Скопировать файл index.php в папку /php
 * Запустить сборку проекта:
 ```shell
-make build 
+make build
 ```   
 * Установить права на папку php:
 ```shell
@@ -37,6 +37,8 @@ make start
 Пароль: devpass
 БД: test_db
 ```
+
+* Панель администратора будет доступна по адресу `moguta-kassa.localhost.com/mg-admin`
 
 ____
 ## Доступные команды из Makefile

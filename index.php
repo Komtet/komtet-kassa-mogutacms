@@ -603,7 +603,7 @@ function upload(){
 //  Установка
 function install(){
     testserver();
-//   checkLaunchingInstall("launching");   
+  checkLaunchingInstall("launching");   
 }
 //  Проверка сервера
 function testserver(){
@@ -686,8 +686,8 @@ function testserver(){
   if(version_compare(PHP_VERSION, '5.6.0', '<')){
     $phpVersion = $sourceAl.'<span class="notify">Необходимо установить PHP не ниже версии 5.6. Текущая версия '.PHP_VERSION.'</span>';
     $err = true;
-  }else if(version_compare(PHP_VERSION, '7.4.99', '>')){
-    $phpVersion = $sourceAl.'<span class="notify">Необходимо установить PHP не выше версии 7.4. Текущая версия '.PHP_VERSION.'</span>';
+  }else if(version_compare(PHP_VERSION, '8.3.99', '>')){
+    $phpVersion = $sourceAl.'<span class="notify">Необходимо установить PHP не выше версии 8.3. Текущая версия '.PHP_VERSION.'</span>';
     $err = true;
   } else {
     $phpVersion = $sourceOk;
@@ -775,7 +775,7 @@ function extractZip($file) {
       $realDocumentRoot = str_replace(DIRECTORY_SEPARATOR.'mg-core'.DIRECTORY_SEPARATOR.'lib', '', dirname(__FILE__));
       $zip->extractTo($realDocumentRoot);
       $zip->close();
-    //   unlink($file);    
+      unlink($file);    
       $arrayEdition=array(
       "MogutaGiperForPHP"=>"giper",
         "MogutaMarketForPHP"=>"market",
@@ -784,9 +784,9 @@ function extractZip($file) {
         //"MogutaRentForPHP"=>"rent" 
       );
       $edition = $arrayEdition[$_REQUEST['edition']];     
-    //   checkLaunchingInstall("upload",$edition);
+      checkLaunchingInstall("upload",$edition);
       if(extension_loaded('Zend OPcache')){@opcache_reset();}
-      header("Location: index.php?step1=go&agree=ok&id=33674");
+      header("Location: index.php?step1=go&agree=ok&id=33639");
       exit();
     }else{
       echo '<div class="error"><p>В процессе распаковки произошла непредвиденная ошибка.<br />
@@ -796,7 +796,7 @@ function extractZip($file) {
 }
 // отправляет на сервер флаг запуска установщика 
 function checkLaunchingInstall($flag = null,$edition="") {
-$id = 33674;
+$id = 33639;
 if ($id&&$flag) {
     $post = "&installer=".$id."&flag=".$flag;
     $url = "https://moguta.ru/checkinstaller";
